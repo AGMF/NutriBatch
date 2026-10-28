@@ -5,6 +5,13 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## 1.0.0 (2026-10-28)
+
+
+### Features
+
+* estrutura inicial do projeto com Vue, Supabase e workflows de CI/CD ([aff3c68](https://github.com/AGMF/NutriBatch/commit/aff3c68bef96b67de9d6a5480849adf50003217d))
+
 ## [Unreleased]
 
 ### Adicionado
