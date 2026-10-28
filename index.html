@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NutriBatch</title>
+    <meta name="description" content="Aplicação web para planejamento de marmitas e calibração de macronutrientes. Oferece recálculo automático de porções, consolidação da lista de compras e cronograma paralelo de preparo.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net;">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="css/main.css" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "supabase": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/index.mjs",
+                "vue": "https://cdn.jsdelivr.net/npm/vue@3.5.44/dist/vue.esm-browser.js"
+            }
+        }
+    </script>
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/index.mjs" integrity="sha512-8F1phw2gstO7wNTRvfX5HIaSIdJxBVeoXco94/tlz7YO6wXmxZF5RXubVuJ/4W1guomWjyDmbksokXs3uMh67w==" crossorigin="anonymous">
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/vue@3.5.44/dist/vue.esm-browser.js" integrity="sha512-7I957ogYhs2hb7WMkXJtC/zaV+IOHXwvGNCtrKu/XEPjyI0AzIqtKm/58Ax/rh853P1aBn5yfhkY80rnvE20ow==" crossorigin="anonymous">
+    <script src="src/main.js" type="module"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <noscript>
+        <p role="alert">O NutriBatch precisa do JavaScript habilitado para funcionar corretamente.</p>
+    </noscript>
+</body>
+</html>
