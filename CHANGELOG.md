@@ -14,7 +14,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Ponto de entrada JavaScript em `src/main.js` com estrutura do componente raiz e montagem no container `#app`.
 - Folha de estilo global da aplicação em `css/main.css`.
 - Workflows de automação e CI/CD para GitHub Actions em `.github/workflows/`:
-  - `deploy.yml`: Implantação contínua (CD) no GitHub Pages a cada push na branch `main` ou disparo manual (*workflow_dispatch*).
+  - `deploy.yml`: Implantação contínua (CD) no GitHub Pages a cada push na branch `main` ou disparo manual (_workflow_dispatch_).
   - `biome.yml`: Integração contínua (CI) para verificação de qualidade e linting de código com Biome em pushes e Pull Requests.
   - `release-please.yml`: Automação de versionamento semântico, geração de changelog e publicação de releases.
 - Arquivos de governança e padronização do repositório: `.gitignore`, `.gitattributes`, `.nojekyll` e licença MIT (`LICENSE`).
