@@ -10,7 +10,6 @@ concurrency:
 
 permissions:
   contents: write
-  workflows: write
 
 jobs:
   format-and-lint:
@@ -19,6 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ github.ref_name }}
 
       - name: Setup Biome
