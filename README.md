@@ -9,4 +9,4 @@
 
 ## 📌 Visão Geral
 
-O **NutriBatch** foi desenvolvido para otimizar a rotina de planejamento nutricional. A ferramenta calcula proporcionalmente a quantidade de insumos necessários com base nos alvos diários de macronutrientes (proteínas, carboidratos e lipídios), gera uma lista de compras otimizada e consolida o tempo de cozimento através de um cronograma de preparo paralelo.
+O [__NutriBatch__](https://agmf.github.io/NutriBatch/) foi desenvolvido para otimizar a rotina de planejamento nutricional. A ferramenta calcula proporcionalmente a quantidade de insumos necessários com base nos alvos diários de macronutrientes (proteínas, carboidratos e lipídios), gera uma lista de compras otimizada e consolida o tempo de cozimento através de um cronograma de preparo paralelo.
