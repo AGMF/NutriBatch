@@ -5,6 +5,20 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## 1.0.0 (2026-11-03)
+
+
+### Features
+
+* estrutura inicial do projeto com Vue, Supabase e workflows de CI/CD ([aff3c68](https://github.com/AGMF/NutriBatch/commit/aff3c68bef96b67de9d6a5480849adf50003217d))
+* implementar internacionalização, interface reativa e rolagem infinita ([7957f15](https://github.com/AGMF/NutriBatch/commit/7957f15b01c833cfe584ddb44e6d08740ce21d93))
+
+
+### Bug Fixes
+
+* corrigir acessibilidade no index.html e regra CSS do v-cloak ([c2ac14b](https://github.com/AGMF/NutriBatch/commit/c2ac14b3e7d9c51742883a2ee5c362d2cee3bd50))
+* permitir unsafe-eval em script-src para compilacao de templates do Vue ([316b630](https://github.com/AGMF/NutriBatch/commit/316b63095d8834076a5998aa03eb42c6e1110111))
+
 ## [Unreleased]
 
 ### Adicionado
