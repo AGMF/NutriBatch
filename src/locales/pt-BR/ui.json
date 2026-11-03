@@ -1,27 +1,27 @@
 {
-  "filters": {
-    "title": "Filtros",
-    "clear": "Limpar filtros"
-  },
-  "categories": {
-    "title": "Categorias",
-    "loading": "Carregando categorias...",
-    "none_assigned": "Nenhuma categoria cadastrada.",
-    "none_found": "Nenhuma categoria encontrada."
-  },
-  "recipe": {
-    "yield_label": "Rendimento:"
-  },
-  "results": {
-    "title": "Resultados",
-    "found_one": "receita encontrada",
-    "found_other": "receitas encontradas",
-    "none_found": "Nenhuma receita encontrada para as categorias selecionadas.",
-    "loading_more": "Carregando...",
-    "end": "Você chegou ao fim dos resultados.",
-    "error": "Erro ao carregar dados: {{error}}"
-  },
-  "actions": {
-    "retry": "Tentar novamente"
-  }
+	"filters": {
+		"title": "Filtros",
+		"clear": "Limpar filtros"
+	},
+	"categories": {
+		"title": "Categorias",
+		"loading": "Carregando categorias...",
+		"none_assigned": "Nenhuma categoria cadastrada.",
+		"none_found": "Nenhuma categoria encontrada."
+	},
+	"recipe": {
+		"yield_label": "Rendimento:"
+	},
+	"results": {
+		"title": "Resultados",
+		"found_one": "receita encontrada",
+		"found_other": "receitas encontradas",
+		"none_found": "Nenhuma receita encontrada para as categorias selecionadas.",
+		"loading_more": "Carregando...",
+		"end": "Você chegou ao fim dos resultados.",
+		"error": "Erro ao carregar dados: {{error}}"
+	},
+	"actions": {
+		"retry": "Tentar novamente"
+	}
 }

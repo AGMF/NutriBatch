@@ -1,10 +1,10 @@
 {
-  "supportedLocales": ["en-US", "pt-BR"],
-  "namespaces": ["categories", "recipes", "ui"],
-  "defaultVersion": "v0.1.0",
-  "fallbackLng": {
-    "pt-PT": ["pt-BR"],
-    "pt": ["pt-BR"],
-    "default": ["pt-BR"]
-  }
+	"supportedLocales": ["en-US", "pt-BR"],
+	"namespaces": ["categories", "recipes", "ui"],
+	"defaultVersion": "v0.1.0",
+	"fallbackLng": {
+		"pt-PT": ["pt-BR"],
+		"pt": ["pt-BR"],
+		"default": ["pt-BR"]
+	}
 }
