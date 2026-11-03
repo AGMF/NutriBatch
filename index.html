@@ -35,7 +35,7 @@
 <body>
     <div id="app" v-cloak>
         <header>
-            <a href="#"><h1>NutriBatch</h1></a>
+            <h1><a href="/">NutriBatch</a></h1>
             <nav>
                 <button v-for="locale in getSupportedLocales()" :key="locale" type="button" :disabled="currentLocale === locale" @click="setLocale(locale)">{{ locale }}</button>
             </nav>
