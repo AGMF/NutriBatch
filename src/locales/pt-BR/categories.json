@@ -1,10 +1,10 @@
 {
-  "gluten-free": "Sem Glúten",
-  "dairy-free": "Sem Lactose",
-  "soy-free": "Sem Soja",
-  "vegan": "Vegano",
-  "vegetarian": "Vegetariano",
-  "egg-free": "Sem Ovo",
-  "nut-free": "Sem Oleaginosas",
-  "sugar-free": "Sem Açúcar"
+	"gluten-free": "Sem Glúten",
+	"dairy-free": "Sem Lactose",
+	"soy-free": "Sem Soja",
+	"vegan": "Vegano",
+	"vegetarian": "Vegetariano",
+	"egg-free": "Sem Ovo",
+	"nut-free": "Sem Oleaginosas",
+	"sugar-free": "Sem Açúcar"
 }

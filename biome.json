@@ -1,7 +1,7 @@
 {
-  "html": {
-    "parser": {
-      "vue": true
-    }
-  }
+	"html": {
+		"parser": {
+			"vue": true
+		}
+	}
 }
