@@ -3,9 +3,10 @@
 > Aplicação web para planejamento de marmitas e calibração de macronutrientes. Oferece recálculo automático de porções, consolidação da lista de compras e cronograma paralelo de preparo.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Vue 3](https://img.shields.io/badge/Vue_3-v3.5.44-41B883?logo=vue.js&logoColor=green)](https://github.com/vuejs/core)
-[![Supabase](https://img.shields.io/badge/Supabase-v2.118.0-3ECF8E?logo=supabase&logoColor=green)](https://github.com/supabase/supabase-js)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES2026-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
+[![Vue 3](https://img.shields.io/badge/Vue_3-v3.5.44-41B883?logo=vue.js&logoColor=41B883)](https://github.com/vuejs/core)
+[![Supabase](https://img.shields.io/badge/Supabase-v2.118.0-3ECF8E?logo=supabase&logoColor=3ECF8E)](https://github.com/supabase/supabase-js)
+[![i18next](https://img.shields.io/badge/i18next-v26.7.1-009688?logo=i18next&logoColor=009688)](https://github.com/i18next/i18next)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES2026-F7DF1E?logo=javascript&logoColor=F7DF1E)](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
 
 ## 📌 Visão Geral
 
