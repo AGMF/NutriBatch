@@ -31,7 +31,7 @@ export const initI18n = async () => {
                     {
                         expirationTime: 7 * 24 * 60 * 60 * 1000, // 7 dias
                         defaultVersion: manifest.defaultVersion,
-                        prefix: 'i18n_res_'
+                        prefix: "i18n_res_"
                     },
                     { loadPath: getLocalePath("{{lng}}/{{ns}}") }
                 ]

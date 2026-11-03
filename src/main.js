@@ -2,8 +2,8 @@ import { createApp, ref, watch, onMounted, onUnmounted } from "vue";
 import { createClient } from "supabase";
 import { initI18n, i18next, i18nextVue, useTranslation, getSupportedLocales } from "./i18n.js";
 
-const SUPABASE_URL = 'https://ecwvgqzzmxnngfhjlejk.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_1uOWx-SNjBrH1ZZSexaLUA_INC5yBQc';
+const SUPABASE_URL = "https://ecwvgqzzmxnngfhjlejk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1uOWx-SNjBrH1ZZSexaLUA_INC5yBQc";
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const PAGE_SIZE = 10;
@@ -40,9 +40,9 @@ const PAGE_SIZE = 10;
                 try {
                     loadingCategories.value = true;
                     const { data, error } = await supabase
-                        .from('categories')
-                        .select('id, code_key')
-                        .order('code_key', { ascending: true });
+                        .from("categories")
+                        .select("id, code_key")
+                        .order("code_key", { ascending: true });
 
                     if (error) throw error;
                     categories.value = data || [];
@@ -80,12 +80,12 @@ const PAGE_SIZE = 10;
                     if (hasCategoryFilter) selectClause += `, recipe_categories_filter:recipe_categories!inner(category_id)`;
 
                     let query = supabase
-                        .from('recipes')
-                        .select(selectClause, { count: 'exact' })
+                        .from("recipes")
+                        .select(selectClause, { count: "exact" })
                         .range(from, to)
-                        .order('created_at', { ascending: false });
+                        .order("created_at", { ascending: false });
 
-                    if (hasCategoryFilter) query = query = query.in('recipe_categories_filter.category_id', selectedCategoryIds.value);
+                    if (hasCategoryFilter) query = query = query.in("recipe_categories_filter.category_id", selectedCategoryIds.value);
 
                     const { data, error, count } = await query;
 
@@ -93,7 +93,7 @@ const PAGE_SIZE = 10;
 
                     const formattedData = (data || []).map(recipe => {
                         if (recipe.recipe_categories && Array.isArray(recipe.recipe_categories))
-                            recipe.recipe_categories.sort((a, b) => (a.categories?.code_key || '').localeCompare(b.categories?.code_key || ''));
+                            recipe.recipe_categories.sort((a, b) => (a.categories?.code_key || "").localeCompare(b.categories?.code_key || ""));
                         return recipe;
                     });
 
@@ -108,7 +108,7 @@ const PAGE_SIZE = 10;
                     totalCount.value = count;
                     hasMore.value = items.value.length < count && formattedData.length === PAGE_SIZE;
                 } catch (err) {
-                    errorMessage.value = err.message || 'Erro ao conectar ao banco.';
+                    errorMessage.value = err.message || "Erro ao conectar ao banco.";
                 } finally {
                     loading.value = false;
                 }
@@ -131,7 +131,7 @@ const PAGE_SIZE = 10;
                 observer = new IntersectionObserver((entries) => {
                     const [entry] = entries;
                     if (entry.isIntersecting && hasMore.value && !loading.value) fetchItems();
-                }, { root: null, rootMargin: '200px', threshold: 0.1 });
+                }, { root: null, rootMargin: "200px", threshold: 0.1 });
 
                 if (sentinel.value) observer.observe(sentinel.value);
             };
