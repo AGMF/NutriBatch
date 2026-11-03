@@ -1,0 +1,27 @@
+{
+  "filters": {
+    "title": "Filters",
+    "clear": "Clear filters"
+  },
+  "categories": {
+    "title": "Categories",
+    "loading": "Loading categories...",
+    "none_assigned": "No categories.",
+    "none_found": "No categories found."
+  },
+  "recipe": {
+    "yield_label": "Yield:"
+  },
+  "results": {
+    "title": "Results",
+    "found_one": "recipe found",
+    "found_other": "recipes found",
+    "none_found": "No recipes found for the selected categories.",
+    "loading_more": "Loading...",
+    "end": "You reached the end of the results.",
+    "error": "Error loading data: {{error}}"
+  },
+  "actions": {
+    "retry": "Try again"
+  }
+}
