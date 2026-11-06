@@ -21,11 +21,11 @@ const PAGE_SIZE = 10;
 	const app = createApp({
 		setup() {
 			const { i18next: i18n } = useTranslation();
-			const currentLocale = ref(i18n.language);
+			const currentLocale = ref(i18n.resolvedLanguage);
 
 			const setLocale = async (locale) => {
 				await i18n.changeLanguage(locale);
-				currentLocale.value = i18n.language;
+				currentLocale.value = i18n.resolvedLanguage;
 			};
 
 			const items = ref([]);

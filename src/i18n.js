@@ -44,7 +44,12 @@ export const initI18n = async () => {
 		});
 
 	document.documentElement.lang = i18next.resolvedLanguage;
-	i18next.on("languageChanged", (lng) => (document.documentElement.lang = lng));
+	const meta = document.querySelector("meta[name='description']");
+	i18next.on("languageChanged", (lng) => {
+		document.documentElement.lang = lng;
+		meta.setAttribute("content", i18next.t("ui:app.description"));
+	});
+
 	return i18next;
 };
 
