@@ -1,4 +1,7 @@
 {
+	"app": {
+		"description": "Web application for meal planning and macronutrient tracking. Features automatic portion recalculation, grocery list consolidation, and parallel prep scheduling."
+	},
 	"filters": {
 		"title": "Filters",
 		"clear": "Clear filters"
@@ -6,7 +9,7 @@
 	"categories": {
 		"title": "Categories",
 		"loading": "Loading categories...",
-		"none_assigned": "No categories.",
+		"none_assigned": "Uncategorized",
 		"none_found": "No categories found."
 	},
 	"recipe": {
@@ -16,10 +19,10 @@
 		"title": "Results",
 		"found_one": "recipe found",
 		"found_other": "recipes found",
-		"none_found": "No recipes found for the selected categories.",
-		"loading_more": "Loading...",
-		"end": "You reached the end of the results.",
-		"error": "Error loading data: {{error}}"
+		"none_found": "No recipes match your selected filters.",
+		"loading_more": "Loading more...",
+		"end": "You've reached the end of the results.",
+		"error": "Failed to load data: {{error}}"
 	},
 	"actions": {
 		"retry": "Try again"

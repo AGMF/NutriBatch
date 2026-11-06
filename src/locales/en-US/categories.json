@@ -5,6 +5,14 @@
 	"vegan": "Vegan",
 	"vegetarian": "Vegetarian",
 	"egg-free": "Egg-Free",
-	"nut-free": "Nut-Free",
-	"sugar-free": "Sugar-Free"
+	"no-sugar-added": "No Sugar Added",
+	"peanut-free": "Peanut-Free",
+	"tree-nut-free": "Tree Nut-Free",
+	"sesame-free": "Sesame-Free",
+	"fish-free": "Fish-Free",
+	"shellfish-free": "Shellfish-Free",
+	"wheat-free": "Wheat-Free",
+	"sulfite-free": "Sulfite-Free",
+	"keto-friendly": "Keto-Friendly",
+	"low-carb": "Low-Carb"
 }

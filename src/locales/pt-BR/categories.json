@@ -1,10 +1,18 @@
 {
-	"gluten-free": "Sem Glúten",
-	"dairy-free": "Sem Lactose",
-	"soy-free": "Sem Soja",
+	"gluten-free": "Sem glúten",
+	"dairy-free": "Sem laticínios",
+	"soy-free": "Sem soja",
 	"vegan": "Vegano",
 	"vegetarian": "Vegetariano",
-	"egg-free": "Sem Ovo",
-	"nut-free": "Sem Oleaginosas",
-	"sugar-free": "Sem Açúcar"
+	"egg-free": "Sem ovos",
+	"no-sugar-added": "Sem adição de açúcares",
+	"peanut-free": "Sem amendoim",
+	"tree-nut-free": "Sem nozes e castanhas",
+	"sesame-free": "Sem gergelim",
+	"fish-free": "Sem peixe",
+	"shellfish-free": "Sem frutos do mar",
+	"wheat-free": "Sem trigo",
+	"sulfite-free": "Sem sulfitos",
+	"keto-friendly": "Cetogênico",
+	"low-carb": "Low carb"
 }
