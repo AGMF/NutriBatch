@@ -1,5 +1,6 @@
 import { createClient } from "supabase";
-import { createApp, onMounted, onUnmounted, ref, watch } from "vue";
+import { createApp, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from "vue";
+import { sortBy } from "lodashEs";
 import {
 	getSupportedLocales,
 	i18next,
@@ -28,8 +29,8 @@ const PAGE_SIZE = 10;
 				currentLocale.value = i18n.resolvedLanguage;
 			};
 
-			const items = ref([]);
-			const categories = ref([]);
+			const items = shallowRef([]);
+			const categories = shallowRef([]);
 			const selectedCategoryIds = ref([]);
 
 			const page = ref(0);
@@ -40,7 +41,7 @@ const PAGE_SIZE = 10;
 			const loadingCategories = ref(true);
 			const errorMessage = ref(null);
 
-			const sentinel = ref(null);
+			const sentinel = useTemplateRef("sentinel");
 			let observer = null;
 
 			const fetchCategories = async () => {
@@ -94,13 +95,12 @@ const PAGE_SIZE = 10;
 						.order("created_at", { ascending: false });
 
 					if (hasCategoryFilter)
-						query = query = query.in(
+						query = query.in(
 							"recipe_categories_filter.category_id",
 							selectedCategoryIds.value,
 						);
 
 					const { data, error, count } = await query;
-
 					if (error) throw error;
 
 					const formattedData = (data || []).map((recipe) => {
@@ -108,11 +108,7 @@ const PAGE_SIZE = 10;
 							recipe.recipe_categories &&
 							Array.isArray(recipe.recipe_categories)
 						)
-							recipe.recipe_categories.sort((a, b) =>
-								(a.categories?.code_key || "").localeCompare(
-									b.categories?.code_key || "",
-								),
-							);
+							recipe.recipe_categories = sortBy(recipe.recipe_categories, "categories.code_key");
 						return recipe;
 					});
 
