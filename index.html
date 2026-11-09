@@ -55,14 +55,18 @@
 
                         <template v-else>
                             <div v-for="category in categories" :key="category.id">
-                                <label>
-                                    <input type="checkbox" :value="category.id" v-model="selectedCategoryIds"/>
-                                    {{ $t(`categories:${category.code_key}`) }}
-                                </label>
+                                <button type="button" role="checkbox" :aria-checked="categoryStates[category.id] === 'include' ? 'true' : categoryStates[category.id] === 'exclude' ? 'mixed' : 'false'" :aria-label="$t('ui:filters.category_aria', { name: $t(`categories:${category.code_key}`), state: $t(`ui:filters.states.${categoryStates[category.id]}`) })" @click="cycleCategoryState(category.id)">
+                                    <span aria-hidden="true">
+                                        <template v-if="categoryStates[category.id] === 'include'">[✓]</template>
+                                        <template v-else-if="categoryStates[category.id] === 'exclude'">[-]</template>
+                                        <template v-else>[ ]</template>
+                                    </span>
+                                    <span>{{ $t(`categories:${category.code_key}`) }}</span>
+                                </button>
                             </div>
 
                             <br />
-                            <button type="button" @click="clearFilters" :disabled="selectedCategoryIds.length === 0">{{ $t('ui:filters.clear') }}</button>
+                            <button type="button" @click="clearFilters" :disabled="Object.keys(categoryStates).length === 0">{{ $t('ui:filters.clear') }}</button>
                         </template>
                     </fieldset>
                 </form>
@@ -71,12 +75,12 @@
             <section>
                 <h2>{{ $t('ui:results.title') }}</h2>
 
-                 <div v-if="errorMessage" role="alert">
-                    <p>{{ $t('ui:results.error', { error: errorMessage }) }}</p>
+                <div v-if="errorMessage" role="alert">
+                    <p>{{ $t('ui:results.error', { error: $t(errorMessage) }) }}</p>
                     <button type="button" @click="resetAndFetch">{{ $t('ui:actions.retry') }}</button>
-                 </div>
+                </div>
 
-                 <template v-else>
+                <template v-else>
                     <p v-if="totalCount !== null">
                         <output>{{ totalCount }}</output> {{ $t('ui:results.found', { count: totalCount }) }}
                     </p>
@@ -90,7 +94,8 @@
                             <div>
                                 <strong>{{ $t('ui:categories.title') }}:</strong>
                                 <template v-if="item.recipe_categories && item.recipe_categories.length > 0">
-                                    <button v-for="rc in item.recipe_categories" :key="rc.categories?.id" type="button" :aria-pressed="selectedCategoryIds.includes(rc.categories?.id)" @click="toggleCategoryFilter(rc.categories?.id)">
+                                    <button v-for="rc in item.recipe_categories" :key="rc.categories?.id" type="button" :aria-pressed="categoryStates[rc.categories?.id] === 'include'" @click="toggleCategoryInclusion(rc.categories?.id)">
+                                        <span v-if="categoryStates[rc.categories?.id] === 'include'">✓ </span>
                                         {{ $t(`categories:${rc.categories?.code_key}`) }}
                                     </button>
                                 </template>
@@ -105,7 +110,7 @@
                         <p v-if="loading" role="status" aria-busy="true">{{ $t('ui:results.loading_more') }}</p>
                         <p v-else-if="!hasMore && items.length > 0">{{ $t('ui:results.end') }}</p>
                     </div>
-                 </template>
+                </template>
             </section>
         </main>
     </div>

@@ -4,7 +4,13 @@
 	},
 	"filters": {
 		"title": "Filtros",
-		"clear": "Limpar filtros"
+		"clear": "Limpar filtros",
+		"states": {
+			"include": "Incluir",
+			"exclude": "Excluir",
+			"ignore": "Ignorar"
+		},
+		"category_aria": "{{name}} (Filtro: {{state}})"
 	},
 	"categories": {
 		"title": "Categorias",
@@ -22,7 +28,8 @@
 		"none_found": "Nenhuma receita encontrada para os filtros selecionados.",
 		"loading_more": "Carregando mais...",
 		"end": "Você chegou ao fim dos resultados.",
-		"error": "Erro ao carregar dados: {{error}}"
+		"error": "Erro ao carregar dados: {{error}}",
+		"connection_error": "Não foi possível conectar ao banco de dados."
 	},
 	"actions": {
 		"retry": "Tentar novamente"

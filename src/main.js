@@ -31,7 +31,7 @@ const PAGE_SIZE = 10;
 
 			const items = shallowRef([]);
 			const categories = shallowRef([]);
-			const selectedCategoryIds = ref([]);
+			const categoryStates = shallowRef({});
 
 			const page = ref(0);
 			const hasMore = ref(true);
@@ -44,6 +44,9 @@ const PAGE_SIZE = 10;
 			const sentinel = useTemplateRef("sentinel");
 			let observer = null;
 
+			let currentRequestId = 0;
+			let debounceTimer = null;
+
 			const fetchCategories = async () => {
 				try {
 					loadingCategories.value = true;
@@ -53,7 +56,13 @@ const PAGE_SIZE = 10;
 						.order("code_key", { ascending: true });
 
 					if (error) throw error;
-					categories.value = data || [];
+
+					const fetchedCategories = data || [];
+					categories.value = fetchedCategories;
+
+					const initialStates = {};
+					fetchedCategories.forEach((category) => initialStates[category.id] = "ignore");
+					categoryStates.value = initialStates;
 				} catch (err) {
 					errorMessage.value = err.message;
 				} finally {
@@ -61,8 +70,39 @@ const PAGE_SIZE = 10;
 				}
 			};
 
+			const cycleCategoryState = (categoryId) => {
+				if (!categoryId) return;
+
+				const currentState = categoryStates.value[categoryId] || "ignore";
+				const newStates = { ...categoryStates.value };
+
+				if (currentState === "ignore") newStates[categoryId] = "include";
+				else if (currentState === "include") newStates[categoryId] = "exclude";
+				else newStates[categoryId] = "ignore";
+
+				categoryStates.value = newStates;
+			};
+
+			const toggleCategoryInclusion = (categoryId) => {
+				if (!categoryId) return;
+
+				const currentState = categoryStates.value[categoryId];
+				const newStates = { ...categoryStates.value };
+				newStates[categoryId] = currentState === "include" ? "ignore" : "include";
+
+				categoryStates.value = newStates;
+			};
+
+			const getCategoryBadge = (state) => {
+				if (state === "include") return "[+] ";
+				if (state === "exclude") return "[-] ";
+				return "";
+			};
+
 			const fetchItems = async (isReset = false) => {
-				if (loading.value || (!hasMore.value && !isReset)) return;
+				if (loading.value && !isReset) return;
+
+				const requestId = ++currentRequestId;
 
 				loading.value = true;
 				errorMessage.value = null;
@@ -72,10 +112,21 @@ const PAGE_SIZE = 10;
 				const to = from + PAGE_SIZE - 1;
 
 				try {
-					const hasCategoryFilter = selectedCategoryIds.value.length > 0;
+					const includedIds = Object.keys(categoryStates.value).filter((id) => categoryStates.value[id] === "include");
+					const excludedIds = Object.keys(categoryStates.value).filter((id) => categoryStates.value[id] === "exclude");
 
-					// 1. Sempre selecionamos todas as categorias da receita via `recipe_categories`
-					// 2. Se houver filtro, adicionamos um alias `recipe_categories_filter` com !inner apenas para aplicar o filtro nas receitas
+					let excludedRecipeIds = [];
+					if (excludedIds.length > 0) {
+						const { data: excludedData, error: excludedErr } = await supabase
+							.from("recipe_categories")
+							.select("recipe_id")
+							.in("category_id", excludedIds);
+
+						if (requestId !== currentRequestId) return;
+						if (excludedErr) throw excludedErr;
+						if (excludedData && excludedData.length > 0) excludedRecipeIds = [...new Set(excludedData.map((row) => row.recipe_id))];
+					}
+
 					let selectClause = `
                         id,
                         name_key,
@@ -85,22 +136,22 @@ const PAGE_SIZE = 10;
                         recipe_categories(category_id, categories(id, code_key))
                     `;
 
-					if (hasCategoryFilter)
-						selectClause += `, recipe_categories_filter:recipe_categories!inner(category_id)`;
+					includedIds.forEach((_, index) => selectClause += `, rc_${index}:recipe_categories!inner(category_id)`);
 
 					let query = supabase
 						.from("recipes")
-						.select(selectClause, { count: "exact" })
+						.select(selectClause, { count: "exact" });
+
+					includedIds.forEach((id, index) => { query = query.eq(`rc_${index}.category_id`, id); });
+
+					if (excludedRecipeIds.length > 0) query = query.not("id", "in", `(${excludedRecipeIds.join(",")})`);
+
+					query = query
 						.range(from, to)
 						.order("created_at", { ascending: false });
 
-					if (hasCategoryFilter)
-						query = query.in(
-							"recipe_categories_filter.category_id",
-							selectedCategoryIds.value,
-						);
-
 					const { data, error, count } = await query;
+					if (requestId !== currentRequestId) return;
 					if (error) throw error;
 
 					const formattedData = (data || []).map((recipe) => {
@@ -124,24 +175,25 @@ const PAGE_SIZE = 10;
 					hasMore.value =
 						items.value.length < count && formattedData.length === PAGE_SIZE;
 				} catch (err) {
-					errorMessage.value = err.message || "Erro ao conectar ao banco.";
+					errorMessage.value = err.message || "ui:results.connection_error";
 				} finally {
-					loading.value = false;
+					if (requestId === currentRequestId) loading.value = false;
 				}
 			};
 
-			const toggleCategoryFilter = (categoryId) => {
-				if (!categoryId) return;
-				const index = selectedCategoryIds.value.indexOf(categoryId);
-				if (index > -1) selectedCategoryIds.value.splice(index, 1);
-				else selectedCategoryIds.value.push(categoryId);
+			const resetAndFetch = async () => await fetchItems(true);
+
+			const clearFilters = () => {
+				const resetStates = {};
+				categories.value.forEach((category) => resetStates[category.id] = "ignore");
+				categoryStates.value = resetStates;
 			};
 
-			const resetAndFetch = () => fetchItems(true);
-
-			const clearFilters = () => (selectedCategoryIds.value = []);
-
-			watch(selectedCategoryIds, () => resetAndFetch(), { deep: true });
+			watch(categoryStates, () => {
+				if (loadingCategories.value) return;
+				if (debounceTimer) clearTimeout(debounceTimer);
+				debounceTimer = setTimeout(() => resetAndFetch(), 500);
+			}, { deep: true });
 
 			const setupIntersectionObserver = () => {
 				observer = new IntersectionObserver(
@@ -156,14 +208,15 @@ const PAGE_SIZE = 10;
 				if (sentinel.value) observer.observe(sentinel.value);
 			};
 
-			onMounted(() => {
-				fetchCategories();
-				fetchItems(true);
+			onMounted(async () => {
+				await fetchCategories();
+				await fetchItems(true);
 				setupIntersectionObserver();
 			});
 
 			onUnmounted(() => {
-				if (observer && sentinel.value) observer.unobserve(sentinel.value);
+				if (debounceTimer) clearTimeout(debounceTimer);
+				if (observer) observer.disconnect();
 			});
 
 			return {
@@ -172,7 +225,7 @@ const PAGE_SIZE = 10;
 				getSupportedLocales,
 				items,
 				categories,
-				selectedCategoryIds,
+				categoryStates,
 				loading,
 				loadingCategories,
 				errorMessage,
@@ -181,7 +234,9 @@ const PAGE_SIZE = 10;
 				sentinel,
 				clearFilters,
 				resetAndFetch,
-				toggleCategoryFilter,
+				cycleCategoryState,
+				toggleCategoryInclusion,
+				getCategoryBadge
 			};
 		},
 	});

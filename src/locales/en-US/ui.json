@@ -4,7 +4,13 @@
 	},
 	"filters": {
 		"title": "Filters",
-		"clear": "Clear filters"
+		"clear": "Clear filters",
+		"states": {
+			"include": "Include",
+			"exclude": "Exclude",
+			"ignore": "Ignore"
+		},
+		"category_aria": "{{name}} (Filter: {{state}})"
 	},
 	"categories": {
 		"title": "Categories",
@@ -22,7 +28,8 @@
 		"none_found": "No recipes match your selected filters.",
 		"loading_more": "Loading more...",
 		"end": "You've reached the end of the results.",
-		"error": "Failed to load data: {{error}}"
+		"error": "Failed to load data: {{error}}",
+		"connection_error": "Unable to connect to the database."
 	},
 	"actions": {
 		"retry": "Try again"
