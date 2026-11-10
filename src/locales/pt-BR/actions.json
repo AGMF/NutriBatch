@@ -1,10 +1,10 @@
 {
-    "boil": "Ferva {{target}}",
-    "saute": "Refogue {{target}}",
-    "toast": "Toste {{target}}",
-    "add": "Adicione {{target}}",
-    "simmer": "Cozinhe {{target}}{{modifier}}",
-    "rest": "Deixe descansar{{modifier}}",
-    "fluff-and-serve": "Solte {{target}} e sirva",
-    "chop": "Pique {{target}}"
+	"boil": "Ferva {{target}}",
+	"saute": "Refogue {{target}}",
+	"toast": "Toste {{target}}",
+	"add": "Adicione {{target}}",
+	"simmer": "Cozinhe {{target}}{{modifier}}",
+	"rest": "Deixe descansar{{modifier}}",
+	"fluff-and-serve": "Solte {{target}} e sirva",
+	"chop": "Pique {{target}}"
 }

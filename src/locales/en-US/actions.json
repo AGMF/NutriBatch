@@ -1,10 +1,10 @@
 {
-    "boil": "Boil {{target}}",
-    "saute": "Sauté {{target}}",
-    "toast": "Toast {{target}}",
-    "add": "Add {{target}}",
-    "simmer": "Simmer {{target}}{{modifier}}",
-    "rest": "Let rest{{modifier}}",
-    "fluff-and-serve": "Fluff {{target}} and serve",
-    "chop": "Chop {{target}}"
+	"boil": "Boil {{target}}",
+	"saute": "Sauté {{target}}",
+	"toast": "Toast {{target}}",
+	"add": "Add {{target}}",
+	"simmer": "Simmer {{target}}{{modifier}}",
+	"rest": "Let rest{{modifier}}",
+	"fluff-and-serve": "Fluff {{target}} and serve",
+	"chop": "Chop {{target}}"
 }

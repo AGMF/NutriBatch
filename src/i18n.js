@@ -53,7 +53,11 @@ export const initI18n = async () => {
 	return i18next;
 };
 
-export const sortTranslated = (list, getKey, locale = i18next.resolvedLanguage) => {
+export const sortTranslated = (
+	list,
+	getKey,
+	locale = i18next.resolvedLanguage,
+) => {
 	if (!Array.isArray(list)) return [];
 	return [...list].sort((a, b) => {
 		const labelA = i18next.t(getKey(a));
