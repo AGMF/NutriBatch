@@ -3,5 +3,12 @@
 		"parser": {
 			"vue": true
 		}
+	},
+	"linter": {
+		"rules": {
+			"a11y": {
+				"useHtmlLang": "off"
+			}
+		}
 	}
 }
