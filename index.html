@@ -55,10 +55,10 @@
 
                         <template v-else>
                             <div v-for="category in categories" :key="category.id">
-                                <button type="button" role="checkbox" :aria-checked="categoryStates[category.id] === 'include' ? 'true' : categoryStates[category.id] === 'exclude' ? 'mixed' : 'false'" :aria-label="$t('ui:filters.category_aria', { name: $t(`categories:${category.code_key}`), state: $t(`ui:filters.states.${categoryStates[category.id]}`) })" @click="cycleCategoryState(category.id)">
+                                <button type="button" :aria-pressed="categoryStates[category.id] === 'include' ? 'true' : categoryStates[category.id] === 'exclude' ? 'mixed' : 'false'" :aria-label="$t('ui:filters.category_aria', { name: $t(`categories:${category.code_key}`), state: $t(`ui:filters.states.${categoryStates[category.id]}`) })" @click="cycleCategoryState(category.id)">
                                     <span aria-hidden="true">
                                         <template v-if="categoryStates[category.id] === 'include'">[✓]</template>
-                                        <template v-else-if="categoryStates[category.id] === 'exclude'">[-]</template>
+                                        <template v-else-if="categoryStates[category.id] === 'exclude'">[✗]</template>
                                         <template v-else>[ ]</template>
                                     </span>
                                     <span>{{ $t(`categories:${category.code_key}`) }}</span>
