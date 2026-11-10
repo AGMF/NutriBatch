@@ -14,7 +14,7 @@ export const initI18n = async () => {
 	const response = await fetch(getLocalePath("manifest"));
 	const manifest = await response.json();
 
-	supportedLocales = manifest.supportedLocales;
+	supportedLocales = manifest.supportedLocales.sort();
 
 	await i18next
 		.use(ChainedBackend)
@@ -51,6 +51,15 @@ export const initI18n = async () => {
 	});
 
 	return i18next;
+};
+
+export const sortTranslated = (list, getKey, locale = i18next.resolvedLanguage) => {
+	if (!Array.isArray(list)) return [];
+	return [...list].sort((a, b) => {
+		const labelA = i18next.t(getKey(a));
+		const labelB = i18next.t(getKey(b));
+		return labelA.localeCompare(labelB, locale);
+	});
 };
 
 export { i18next, i18nextVue, useTranslation };

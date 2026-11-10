@@ -92,7 +92,7 @@
                             <h3>{{ $t(`recipes:${item.name_key}`) }}</h3>
 
                             <div>
-                                <strong>{{ $t('ui:categories.title') }}:</strong>
+                                <strong>{{ $t('ui:categories.title') }}</strong>
                                 <template v-if="item.recipe_categories && item.recipe_categories.length > 0">
                                     <button v-for="rc in item.recipe_categories" :key="rc.categories?.id" type="button" :aria-pressed="categoryStates[rc.categories?.id] === 'include'" @click="toggleCategoryInclusion(rc.categories?.id)">
                                         <span v-if="categoryStates[rc.categories?.id] === 'include'">✓ </span>
@@ -102,7 +102,63 @@
                                 <span v-else>{{ $t('ui:categories.none_assigned') }}</span>
                             </div>
                             <p>{{ $t(`recipes:${item.description_key}`) }}</p>
-                            <p><strong>{{ $t('ui:recipe.yield_label') }}</strong> {{ item.yield_factor }}x</p>
+                            <ul>
+                                <li><strong>{{ $t('ui:recipe.total_time') }}</strong> {{ formatDuration(item.total_duration_minutes) }}</li>
+                                <li><strong>{{ $t('ui:recipe.difficulty_label') }}</strong> {{ $t(`ui:recipe.difficulty.${item.difficulty_level}`) }}</li>
+                                <li><strong>{{ $t('ui:recipe.equipment', { count: item.preparation_steps }) }}</strong> {{ formatRecipeEquipment(item.preparation_steps) }}</li>
+                                <li><strong>{{ $t('ui:recipe.portion_size') }}</strong> {{ formatGram(100, 'gram') }}</li>
+                                <li><strong>{{ $t('ui:recipe.calories_per_portion') }}</strong> {{ item.portion_calories.toFixed(0) }} kcal</li>
+                            </ul>
+
+                            <details>
+                                <summary><strong>{{ $t('ui:recipe.ingredients_title') }}</strong></summary>
+                                <ul>
+                                    <li v-for="ri in item.recipe_ingredients" :key="ri.ingredients?.id">
+                                        {{ $t('ui:recipe.ingredient_item', { quantity: formatGram(ri.quantity_grams, ri.ingredients.unit), name: $t(`ingredients:${ri.ingredients?.code_key}`) }) }}
+                                    </li>
+                                </ul>
+                            </details>
+
+                            <details>
+                                <summary><strong>{{ $t('ui:recipe.steps_title') }}</strong></summary>
+                                <ol>
+                                    <li v-for="step in item.preparation_steps" :key="step.step_number">
+                                        <p>
+                                            {{ formatPreparationStep(step.action_key) }}
+                                            <span v-if="step.duration_minutes > 0">({{ formatDuration(step.duration_minutes) }})</span>
+                                            <template v-if="step.equipment">
+                                                — <small><strong>{{ $t('ui:recipe.equipment', { count: 1 }) }}</strong> {{ $t(`equipment:${step.equipment.code_key}`) }}</small>
+                                            </template>
+                                        </p>
+                                    </li>
+                                </ol>
+                            </details>
+
+                            <details>
+                                <summary><strong>{{ $t('ui:nutrition.title') }}</strong></summary>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>{{ $t('ui:nutrition.nutrient') }}</th>
+                                            <th>{{ $t('ui:nutrition.per_portion') }} ({{ formatGram(100, 'gram') }})</th>
+                                            <th>{{ $t('ui:nutrition.total_recipe') }} ({{ formatGram(item.total_yield_grams, 'gram') }})</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="nut in item.nutrients" :key="nut.key">
+                                            <td>{{ $t(`ui:nutrition.nutrients.${nut.key}`) }}</td>
+                                            <td>
+                                                {{ formatNutrientValue(nut.portion) }}
+                                                {{ $t(`ui:nutrition.units.${nut.key}`, { defaultValue: 'g' }) }}
+                                            </td>
+                                            <td>
+                                                {{ formatNutrientValue(nut.total) }}
+                                                {{ $t(`ui:nutrition.units.${nut.key}`, { defaultValue: 'g' }) }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </details>
                         </article>
                     </div>
 
@@ -113,6 +169,9 @@
                 </template>
             </section>
         </main>
+        <footer>
+            <small>{{ $t('ui:app.legal') }}</small>
+        </footer>
     </div>
     <noscript>
         <p role="alert">O NutriBatch precisa do JavaScript habilitado para funcionar corretamente.</p>

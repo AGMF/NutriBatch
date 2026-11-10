@@ -1,6 +1,7 @@
 {
 	"app": {
-		"description": "Web application for meal planning and macronutrient tracking. Features automatic portion recalculation, grocery list consolidation, and parallel prep scheduling."
+		"description": "Web application for meal planning and macronutrient tracking. Features automatic portion recalculation, grocery list consolidation, and parallel prep scheduling.",
+		"legal": "Information is for reference purposes only."
 	},
 	"filters": {
 		"title": "Filters",
@@ -13,13 +14,39 @@
 		"category_aria": "{{name}} (Filter: {{state}})"
 	},
 	"categories": {
-		"title": "Categories",
+		"title": "Categories:",
 		"loading": "Loading categories...",
 		"none_assigned": "Uncategorized",
 		"none_found": "No categories found."
 	},
 	"recipe": {
-		"yield_label": "Yield:"
+		"total_time": "Total time:",
+		"difficulty_label": "Difficulty: ",
+		"portion_size": "Serving size:",
+		"calories_per_portion": "Calories per serving:",
+		"ingredients_title": "Ingredients",
+		"steps_title": "Instructions",
+		"equipment_one": "Equipment needed:",
+		"equipment_other": "Equipment needed:",
+		"ingredient_item": "{{quantity}} {{name}}",
+		"difficulty": {
+			"easy": "easy",
+			"medium": "medium",
+			"hard": "hard",
+			"expert": "advanced"
+		}
+	},
+	"nutrition": {
+		"title": "Nutrition Facts",
+		"nutrient": "Nutrient",
+		"per_portion": "Per serving",
+		"total_recipe": "Entire recipe",
+		"nutrients": {
+			"calories": "Calories",
+			"proteins": "Protein",
+			"carbs": "Carbs",
+			"fats": "Total Fat"
+		}
 	},
 	"results": {
 		"title": "Results",

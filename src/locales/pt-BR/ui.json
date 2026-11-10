@@ -1,6 +1,7 @@
 {
 	"app": {
-		"description": "Aplicação web para planejamento de refeições e monitoramento de macronutrientes. Oferece recálculo automático de porções, consolidação da lista de compras e cronograma de preparo simultâneo."
+		"description": "Aplicação web para planejamento de refeições e monitoramento de macronutrientes. Oferece recálculo automático de porções, consolidação da lista de compras e cronograma de preparo simultâneo.",
+		"legal": "As informações são apenas para fins de referência."
 	},
 	"filters": {
 		"title": "Filtros",
@@ -13,13 +14,39 @@
 		"category_aria": "{{name}} (Filtro: {{state}})"
 	},
 	"categories": {
-		"title": "Categorias",
+		"title": "Categorias:",
 		"loading": "Carregando categorias...",
 		"none_assigned": "Sem categoria",
 		"none_found": "Nenhuma categoria encontrada."
 	},
 	"recipe": {
-		"yield_label": "Rendimento:"
+		"total_time": "Tempo total:",
+		"difficulty_label": "Dificuldade: ",
+		"portion_size": "Tamanho da porção:",
+		"calories_per_portion": "Calorias por porção:",
+		"ingredients_title": "Ingredientes",
+		"steps_title": "Modo de Preparo",
+		"equipment_one": "Equipamento necessário:",
+		"equipment_other": "Equipamentos necessários:",
+		"ingredient_item": "{{quantity}} de {{name}}",
+		"difficulty": {
+			"easy": "fácil",
+			"medium": "média",
+			"hard": "difícil",
+			"expert": "avançada"
+		}
+	},
+	"nutrition": {
+		"title": "Tabela Nutricional",
+		"nutrient": "Nutriente",
+		"per_portion": "Por porção",
+		"total_recipe": "Total da receita",
+		"nutrients": {
+			"calories": "Calorias",
+			"proteins": "Proteínas",
+			"carbs": "Carboidratos",
+			"fats": "Gorduras Totais"
+		}
 	},
 	"results": {
 		"title": "Resultados",

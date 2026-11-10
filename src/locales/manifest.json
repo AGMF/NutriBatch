@@ -1,6 +1,6 @@
 {
 	"supportedLocales": ["en-US", "pt-BR"],
-	"namespaces": ["categories", "recipes", "ui"],
+	"namespaces": ["actions", "categories", "equipment", "ingredients", "modifiers", "recipes", "ui"],
 	"defaultVersion": "v0.1.0",
 	"fallbackLng": {
 		"pt-PT": ["pt-BR"],

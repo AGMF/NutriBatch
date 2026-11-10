@@ -6,7 +6,8 @@ import {
 	i18next,
 	i18nextVue,
 	initI18n,
-	useTranslation,
+	sortTranslated,
+	useTranslation
 } from "./i18n.js";
 
 const SUPABASE_URL = "https://ecwvgqzzmxnngfhjlejk.supabase.co";
@@ -21,12 +22,34 @@ const PAGE_SIZE = 10;
 
 	const app = createApp({
 		setup() {
-			const { i18next: i18n } = useTranslation();
+			const { i18next: i18n, t } = useTranslation();
 			const currentLocale = ref(i18n.resolvedLanguage);
+
+			const applyGlobalSorting = () => {
+				if (categories.value.length > 0)
+					categories.value = sortTranslated(categories.value, (c) => `categories:${c.code_key}`);
+
+				if (items.value.length > 0) {
+					items.value = items.value.map((recipe) => ({
+						...recipe,
+						recipe_ingredients: sortTranslated(recipe.recipe_ingredients, (ri) => `ingredients:${ri.ingredients?.code_key}`),
+						nutrients: sortTranslated(recipe.nutrients, (n) => `ui:nutrition.nutrients.${n.key}`)
+					}));
+				}
+			};
 
 			const setLocale = async (locale) => {
 				await i18n.changeLanguage(locale);
 				currentLocale.value = i18n.resolvedLanguage;
+				applyGlobalSorting();
+			};
+
+			const formatDuration = (totalMinutes) => {
+				const formatter = new Intl.DurationFormat(currentLocale.value, { style: 'narrow' });
+				const hours = Math.floor(totalMinutes / 60);
+				const minutes = totalMinutes % 60;
+
+				return formatter.format({ hours, minutes });
 			};
 
 			const items = shallowRef([]);
@@ -46,22 +69,22 @@ const PAGE_SIZE = 10;
 
 			let currentRequestId = 0;
 			let debounceTimer = null;
+			let effortLevels = [];
 
 			const fetchCategories = async () => {
 				try {
 					loadingCategories.value = true;
 					const { data, error } = await supabase
 						.from("categories")
-						.select("id, code_key")
-						.order("code_key", { ascending: true });
+						.select("id, code_key");
 
 					if (error) throw error;
 
 					const fetchedCategories = data || [];
-					categories.value = fetchedCategories;
+					categories.value = sortTranslated(fetchedCategories, (c) => `categories:${c.code_key}`);
 
 					const initialStates = {};
-					fetchedCategories.forEach((category) => initialStates[category.id] = "ignore");
+					fetchedCategories.forEach((c) => initialStates[c.id] = "ignore");
 					categoryStates.value = initialStates;
 				} catch (err) {
 					errorMessage.value = err.message;
@@ -133,7 +156,9 @@ const PAGE_SIZE = 10;
                         description_key,
                         yield_factor,
                         created_at,
-                        recipe_categories(category_id, categories(id, code_key))
+                        recipe_categories(category_id, categories(id, code_key)),
+						preparation_steps(step_number, action_key, equipment(id, code_key), effort_type, duration_minutes, is_active),
+						recipe_ingredients(quantity_grams, ingredients(*))
                     `;
 
 					includedIds.forEach((_, index) => selectClause += `, rc_${index}:recipe_categories!inner(category_id)`);
@@ -155,12 +180,61 @@ const PAGE_SIZE = 10;
 					if (error) throw error;
 
 					const formattedData = (data || []).map((recipe) => {
-						if (
-							recipe.recipe_categories &&
-							Array.isArray(recipe.recipe_categories)
-						)
-							recipe.recipe_categories = sortBy(recipe.recipe_categories, "categories.code_key");
-						return recipe;
+						if (recipe.recipe_categories && Array.isArray(recipe.recipe_categories))
+							recipe.recipe_categories = sortTranslated(recipe.recipe_categories, (rc) => `categories:${rc.categories?.code_key}`);
+						if (recipe.recipe_ingredients && Array.isArray(recipe.recipe_ingredients))
+							recipe.recipe_ingredients = sortTranslated(recipe.recipe_ingredients, (ri) => `ingredients:${ri.ingredients?.code_key}`);
+						if (recipe.preparation_steps && Array.isArray(recipe.preparation_steps))
+							recipe.preparation_steps = sortBy(recipe.preparation_steps, "step_number");
+
+						const totalDuration = (recipe.preparation_steps || []).reduce((acc, step) => acc + (step.duration_minutes || 0), 0);
+
+						let totalWeight = 0;
+						const totals = {};
+
+						(recipe.recipe_ingredients || []).forEach((ri) => {
+							const qty = Number(ri.quantity_grams) || 0;
+							const ing = ri.ingredients || {};
+							totalWeight += qty;
+
+							Object.entries(ing).forEach(([key, val]) => {
+								if (key.endsWith("_100g") && val !== null) {
+									const nutrientKey = key.replace("_100g", "");
+									const numericVal = Number(val) || 0;
+									totals[nutrientKey] = (totals[nutrientKey] || 0) + (qty / 100) * numericVal;
+								}
+							});
+						});
+
+						const yieldFactor = Number(recipe.yield_factor);
+						const totalYieldGrams = Math.round(totalWeight * yieldFactor);
+
+						const PORTION_WEIGHT = 100;
+						const portionFactor = totalWeight > 0 ? PORTION_WEIGHT / totalWeight : 0;
+
+						const nutrients = sortTranslated(
+							Object.entries(totals)
+								.filter(([_, totalVal]) => totalVal > 0)
+								.map(([key, totalVal]) => ({
+									key,
+									total: totalVal,
+									portion: totalVal * portionFactor,
+								})),
+								(n) => `ui:nutrition.nutrients.${n.key}`
+							);
+
+						const caloriesNutrient = nutrients.find((n) => n.key === "calories");
+						const portionCalories = caloriesNutrient ? caloriesNutrient.portion : 0;
+						const difficultyLevel = calculateDifficulty(recipe.preparation_steps, effortLevels);
+
+						return {
+							...recipe,
+							total_duration_minutes: totalDuration,
+							portion_calories: portionCalories,
+							total_yield_grams: totalYieldGrams,
+							difficulty_level: difficultyLevel,
+							nutrients
+						};
 					});
 
 					if (isReset) {
@@ -179,6 +253,108 @@ const PAGE_SIZE = 10;
 				} finally {
 					if (requestId === currentRequestId) loading.value = false;
 				}
+			};
+
+			const fetchEffortLevels = async () => {
+				try {
+					const { data, error } = await supabase.rpc('get_effort_levels');
+					if (error) throw error;
+
+					if (data && Array.isArray(data)) effortLevels = data;
+				} catch (err) {
+					console.error('Erro ao buscar enum effort_level:', err.message || err);
+				}
+			};
+
+			const formatNutrientValue = (val) => {
+				if (!val || val === 0) return "0";
+				if (val >= 100) return val.toFixed(0);
+				if (val >= 10) return val.toFixed(1);
+				return val.toFixed(2);
+			};
+
+			const formatPreparationStep = (rawActionKey) => {
+				if (!rawActionKey) return "";
+
+				const [actionAndTargets, modifierKey] = rawActionKey.split("@");
+				const [action, rawTarget] = actionAndTargets.split("__");
+
+				let modifierText = "";
+				if (modifierKey) {
+					const translatedModifier = t(`modifiers:${modifierKey}`, { defaultValue: modifierKey });
+					modifierText = ` ${translatedModifier}`;
+				}
+
+				let formattedTargets = "";
+				if (rawTarget) {
+					const targetKeys = rawTarget.split("-and-");
+					const translatedTargets = targetKeys.map((key) => t(`ingredients:${key}`, { context: "article", defaultValue: key }));
+
+					const listFormatter = new Intl.ListFormat(currentLocale.value, { style: "long", type: "conjunction" });
+					formattedTargets = listFormatter.format(translatedTargets);
+				}
+
+				return t(`actions:${action}`, {
+					target: formattedTargets,
+					modifier: modifierText,
+					defaultValue: `${action} ${formattedTargets}${modifierText}`.trim()
+				});
+			};
+
+			const formatGram = (amount, unit) => {
+				return new Intl.NumberFormat(currentLocale.value, {
+					style: "unit",
+					unit: unit,
+					unitDisplay: "narrow"
+				}).format(amount);
+			};
+
+			const formatRecipeEquipment = (steps) => {
+				if (!steps || steps.length === 0) return "";
+
+				const rawKeys = steps
+					.map((s) => s.equipment.code_key)
+					.filter(Boolean)
+					.flatMap((key) => key.split("-and-"));
+				if (rawKeys.length === 0) return "";
+
+				const translatedEquipment = [...new Set(rawKeys.map((key) => t(`equipment:${key}`)))]
+					.sort((a, b) => a.localeCompare(b, currentLocale.value));
+
+				const listFormatter = new Intl.ListFormat(currentLocale.value, { style: "long", type: "conjunction" });
+				return listFormatter.format(translatedEquipment);
+			};
+
+			const calculateDifficulty = (steps, effortLevels) => {
+				if (!steps || steps.length === 0) return effortLevels[0];
+
+				const totalTiers = effortLevels.length;
+				const effortWeights = {};
+				effortLevels.forEach((level, index) => effortWeights[level] = index++);
+
+				let activeMinutes = 0;
+				let effortScore = 0;
+				let hasMaxEffort = false;
+
+				steps.forEach((s) => {
+					const weight = effortWeights[s.effort_type];
+					if (weight === totalTiers) hasMaxEffort = true;
+
+					if (s.is_active) {
+						const duration = s.duration_minutes;
+						activeMinutes += duration;
+						effortScore += weight * duration;
+					}
+				});
+
+				const totalScore = activeMinutes + effortScore * 0.5 + steps.length * 0.8;
+				const REFERENCE_MAX_SCORE = 45;
+				const normalizedRatio = Math.min(totalScore / REFERENCE_MAX_SCORE, 0.99);
+				let levelIndex = Math.floor(normalizedRatio * totalTiers);
+
+				if (hasMaxEffort && levelIndex === 0 && totalTiers > 1) levelIndex = 1;
+
+				return effortLevels[levelIndex];
 			};
 
 			const resetAndFetch = async () => await fetchItems(true);
@@ -209,6 +385,7 @@ const PAGE_SIZE = 10;
 			};
 
 			onMounted(async () => {
+				await fetchEffortLevels();
 				await fetchCategories();
 				await fetchItems(true);
 				setupIntersectionObserver();
@@ -236,7 +413,12 @@ const PAGE_SIZE = 10;
 				resetAndFetch,
 				cycleCategoryState,
 				toggleCategoryInclusion,
-				getCategoryBadge
+				getCategoryBadge,
+				formatPreparationStep,
+				formatNutrientValue,
+				formatGram,
+				formatDuration,
+				formatRecipeEquipment
 			};
 		},
 	});
