@@ -30,9 +30,9 @@
 		"equipment_other": "Equipment needed:",
 		"ingredient_item": "{{quantity}} {{name}}",
 		"difficulty": {
-			"easy": "easy",
+			"low": "easy",
 			"medium": "medium",
-			"hard": "hard",
+			"high": "hard",
 			"expert": "advanced"
 		}
 	},
