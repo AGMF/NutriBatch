@@ -83,9 +83,7 @@ const PAGE_SIZE = 10;
 					const fetchedCategories = data || [];
 					categories.value = sortTranslated(fetchedCategories, (c) => `categories:${c.code_key}`);
 
-					const initialStates = {};
-					fetchedCategories.forEach((c) => initialStates[c.id] = "ignore");
-					categoryStates.value = initialStates;
+					categoryStates.value = Object.fromEntries(fetchedCategories.map((c) => [c.id, "ignore"]));
 				} catch (err) {
 					errorMessage.value = err.message;
 				} finally {
@@ -161,7 +159,9 @@ const PAGE_SIZE = 10;
 						recipe_ingredients(quantity_grams, ingredients(*))
                     `;
 
-					includedIds.forEach((_, index) => selectClause += `, rc_${index}:recipe_categories!inner(category_id)`);
+					selectClause += includedIds
+						.map((_, index) => `, rc_${index}:recipe_categories!inner(category_id)`)
+						.join("");
 
 					let query = supabase
 						.from("recipes")
@@ -329,8 +329,7 @@ const PAGE_SIZE = 10;
 				if (!steps || steps.length === 0) return effortLevels[0];
 
 				const totalTiers = effortLevels.length;
-				const effortWeights = {};
-				effortLevels.forEach((level, index) => effortWeights[level] = index++);
+				const effortWeights = Object.fromEntries(effortLevels.map((level, index) => [level, index]));
 
 				let activeMinutes = 0;
 				let effortScore = 0;
@@ -359,11 +358,7 @@ const PAGE_SIZE = 10;
 
 			const resetAndFetch = async () => await fetchItems(true);
 
-			const clearFilters = () => {
-				const resetStates = {};
-				categories.value.forEach((category) => resetStates[category.id] = "ignore");
-				categoryStates.value = resetStates;
-			};
+			const clearFilters = () => categoryStates.value = Object.fromEntries(categories.value.map((c) => [c.id, "ignore"]));
 
 			watch(categoryStates, () => {
 				if (loadingCategories.value) return;
