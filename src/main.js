@@ -1,6 +1,6 @@
-import { sortBy } from "lodashEs";
 import { createClient } from "supabase";
 import {
+	computed,
 	createApp,
 	onMounted,
 	onUnmounted,
@@ -25,6 +25,253 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const PAGE_SIZE = 10;
 
+const NEXT_CATEGORY_STATE = {
+	ignore: "include",
+	include: "exclude",
+	exclude: "ignore",
+};
+
+const nextCategoryState = (currentState = "ignore") =>
+	NEXT_CATEGORY_STATE[currentState] ?? "ignore";
+
+const toggleCategoryState = (currentState) =>
+	currentState === "include" ? "ignore" : "include";
+
+const createDurationFormatter = (locale, style = "narrow") => {
+	const formatter = new Intl.DurationFormat(locale, { style });
+	return (totalMinutes) =>
+		formatter.format({
+			hours: Math.floor(totalMinutes / 60),
+			minutes: totalMinutes % 60,
+		});
+};
+
+const createListFormatter = (locale, type = "conjunction") => {
+	const formatter = new Intl.ListFormat(locale, { style: "long", type });
+	return (items) => formatter.format(items);
+};
+
+const calculateDifficulty = (steps = [], effortLevels = []) => {
+	if (!steps.length || !effortLevels.length) return effortLevels[0];
+
+	const totalTiers = effortLevels.length;
+	const effortWeights = Object.fromEntries(
+		effortLevels.map((level, index) => [level, index]),
+	);
+
+	const { activeMinutes, effortScore, hasMaxEffort } = steps.reduce(
+		(acc, step) => {
+			const weight = effortWeights[step.effort_type] ?? 0;
+			const isMax = weight === totalTiers - 1;
+			const duration = step.is_active ? step.duration_minutes || 0 : 0;
+
+			return {
+				activeMinutes: acc.activeMinutes + duration,
+				effortScore: acc.effortScore + (step.is_active ? weight * duration : 0),
+				hasMaxEffort: acc.hasMaxEffort || isMax,
+			};
+		},
+		{ activeMinutes: 0, effortScore: 0, hasMaxEffort: false },
+	);
+
+	const totalScore = activeMinutes + effortScore * 0.5 + steps.length * 0.8;
+	const rawRatio = Math.min(totalScore / 45, 0.99);
+	const calculatedIndex = Math.floor(rawRatio * totalTiers);
+
+	const finalIndex = (hasMaxEffort && calculatedIndex === 0 && totalTiers > 1)
+		? 1
+		: calculatedIndex;
+
+	return effortLevels[finalIndex];
+};
+
+const extractIngredientNutrients = (recipeIngredient) => {
+	const qty = Number(recipeIngredient.quantity_grams) || 0;
+	const ing = recipeIngredient.ingredients || {};
+
+	return Object.entries(ing)
+		.filter(([key, val]) => key.endsWith("_100g") && val !== null)
+		.map(([key, val]) => ({
+			key: key.replace("_100g", ""),
+			amount: (qty / 100) * (Number(val) || 0),
+			qty,
+		}));
+};
+
+const computeNutrients = (recipeIngredients = [], sortFn) => {
+	const totalWeight = recipeIngredients.reduce(
+		(sum, ri) => sum + (Number(ri.quantity_grams) || 0),
+		0
+	);
+
+	const totals = recipeIngredients
+		.flatMap(extractIngredientNutrients)
+		.reduce((acc, { key, amount }) => {
+			acc[key] = (acc[key] || 0) + amount;
+			return acc;
+		}, {});
+
+	const portionFactor = totalWeight > 0 ? 100 / totalWeight : 0;
+
+	const nutrientsList = Object.entries(totals)
+		.filter(([_, total]) => total > 0)
+		.map(([key, total]) => ({
+			key,
+			total,
+			portion: total * portionFactor,
+		}));
+
+	return {
+		totalWeight,
+		nutrients: sortFn ? sortFn(nutrientsList) : nutrientsList,
+	};
+};
+
+const transformRecipe = (recipe, effortLevels, sortFn) => {
+	const preparationSteps = (recipe.preparation_steps || []).toSorted(
+		(a, b) => a.step_number - b.step_number,
+	);
+
+	const totalDurationMinutes = preparationSteps.reduce(
+		(acc, s) => acc + (s.duration_minutes || 0),
+		0,
+	);
+
+	const { totalWeight, nutrients } = computeNutrients(
+		recipe.recipe_ingredients,
+		sortFn,
+	);
+
+	const caloriesNutrient = nutrients.find((n) => n.key === "calories");
+	const portionCalories = caloriesNutrient ? caloriesNutrient.portion : 0;
+
+	return {
+		...recipe,
+		preparation_steps: preparationSteps,
+		total_duration_minutes: totalDurationMinutes,
+		portion_calories: portionCalories,
+		total_yield_grams: Math.round(totalWeight * Number(recipe.yield_factor || 0)),
+		difficulty_level: calculateDifficulty(preparationSteps, effortLevels),
+		nutrients,
+	};
+};
+
+const getUniqueEquipmentKeys = (steps = []) => [
+	...new Set(
+		steps
+			.map((s) => s.equipment?.code_key)
+			.filter(Boolean)
+			.flatMap((key) => key.split("-and-"))
+	),
+];
+
+const formatRecipeEquipment = (steps, locale, translateFn) => {
+	const keys = getUniqueEquipmentKeys(steps);
+	if (!keys.length) return "";
+
+	const translated = keys
+		.map((key) => translateFn(`equipment:${key}`))
+		.toSorted((a, b) => a.localeCompare(b, locale));
+
+	return createListFormatter(locale)(translated);
+};
+
+const parseActionKey = (rawActionKey = "") => {
+	if (!rawActionKey) return null;
+	const [actionAndTargets, modifierKey] = rawActionKey.split("@");
+	const [action, rawTarget] = actionAndTargets.split("__");
+	const targetKeys = rawTarget ? rawTarget.split("-and-") : [];
+
+	return { action, modifierKey, targetKeys };
+};
+
+const formatPreparationStep = (rawActionKey, locale, translate) => {
+	const parsed = parseActionKey(rawActionKey);
+	if (!parsed) return "";
+
+	const { action, modifierKey, targetKeys } = parsed;
+
+	const modifierText = modifierKey
+		? ` ${translate(`modifiers:${modifierKey}`, { defaultValue: modifierKey })}`
+		: "";
+
+	const translatedTargets = targetKeys.map((key) =>
+		translate(`ingredients:${key}`, { context: "article", defaultValue: key }),
+	);
+
+	const formattedTargets = translatedTargets.length
+		? createListFormatter(locale)(translatedTargets)
+		: "";
+
+	return translate(`actions:${action}`, {
+		target: formattedTargets,
+		modifier: modifierText,
+		defaultValue: `${action} ${formattedTargets}${modifierText}`.trim(),
+	});
+};
+
+const updateKey = (map, key, transform) => ({
+	...map,
+	[key]: transform(map[key]),
+});
+
+const getCategoryIdsByState = (categoryStates = {}, targetState) =>
+	Object.entries(categoryStates)
+		.filter(([_, state]) => state === targetState)
+		.map(([id]) => id);
+
+const calculateRange = (page, pageSize) => ({
+	from: page * pageSize,
+	to: (page + 1) * pageSize - 1,
+});
+
+const BASE_SELECT_FIELDS = `
+	id,
+	name_key,
+	description_key,
+	yield_factor,
+	created_at,
+	recipe_categories(category_id, categories(id, code_key)),
+	preparation_steps(step_number, action_key, equipment(id, code_key), effort_type, duration_minutes, is_active),
+	recipe_ingredients(quantity_grams, ingredients(*))
+`.trim();
+
+const buildSelectClause = (includedIds = []) =>
+	includedIds.reduce(
+		(acc, _, index) => `${acc}, rc_${index}:recipe_categories!inner(category_id)`,
+		BASE_SELECT_FIELDS
+	);
+
+const fetchExcludedRecipeIds = async (client, excludedCategoryIds = []) => {
+	if (!excludedCategoryIds.length) return [];
+
+	const { data, error } = await client
+		.from("recipe_categories")
+		.select("recipe_id")
+		.in("category_id", excludedCategoryIds);
+
+	if (error) throw error;
+	return [...new Set((data || []).map((row) => row.recipe_id))];
+};
+
+const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], from, to }) => {
+	const selectClause = buildSelectClause(includedIds);
+	const baseQuery = client.from("recipes").select(selectClause, { count: "exact" });
+
+	const queryWithIncludes = includedIds.reduce(
+		(query, id, index) => query.eq(`rc_${index}.category_id`, id),
+		baseQuery
+	);
+
+	const queryWithExcludes = excludedRecipeIds.length > 0
+		? queryWithIncludes.not("id", "in", `(${excludedRecipeIds.join(",")})`)
+		: queryWithIncludes;
+
+	return queryWithExcludes
+		.range(from, to)
+		.order("created_at", { ascending: false });
+};
+
 (async () => {
 	await initI18n();
 
@@ -34,23 +281,18 @@ const PAGE_SIZE = 10;
 			const currentLocale = ref(i18n.resolvedLanguage);
 
 			const applyGlobalSorting = () => {
+				const categorySortKey = (c) => `categories:${c.code_key}`;
+				const ingredientSortKey = (ri) => `ingredients:${ri.ingredients?.code_key}`;
+				const nutrientSortKey = (n) => `ui:nutrition.nutrients.${n.key}`;
+
 				if (categories.value.length > 0)
-					categories.value = sortTranslated(
-						categories.value,
-						(c) => `categories:${c.code_key}`,
-					);
+					categories.value = sortTranslated(categories.value, categorySortKey);
 
 				if (items.value.length > 0) {
 					items.value = items.value.map((recipe) => ({
 						...recipe,
-						recipe_ingredients: sortTranslated(
-							recipe.recipe_ingredients,
-							(ri) => `ingredients:${ri.ingredients?.code_key}`,
-						),
-						nutrients: sortTranslated(
-							recipe.nutrients,
-							(n) => `ui:nutrition.nutrients.${n.key}`,
-						),
+						recipe_ingredients: sortTranslated(recipe.recipe_ingredients, ingredientSortKey),
+						nutrients: sortTranslated(recipe.nutrients, nutrientSortKey),
 					}));
 				}
 			};
@@ -61,15 +303,9 @@ const PAGE_SIZE = 10;
 				applyGlobalSorting();
 			};
 
-			const formatDuration = (totalMinutes) => {
-				const formatter = new Intl.DurationFormat(currentLocale.value, {
-					style: "narrow",
-				});
-				const hours = Math.floor(totalMinutes / 60);
-				const minutes = totalMinutes % 60;
+			const durationFormatter = computed(() => createDurationFormatter(currentLocale.value));
 
-				return formatter.format({ hours, minutes });
-			};
+			const formatDuration = (totalMinutes) => durationFormatter.value(totalMinutes);
 
 			const items = shallowRef([]);
 			const categories = shallowRef([]);
@@ -115,207 +351,53 @@ const PAGE_SIZE = 10;
 				}
 			};
 
-			const cycleCategoryState = (categoryId) => {
-				if (!categoryId) return;
-
-				const currentState = categoryStates.value[categoryId] || "ignore";
-				const newStates = { ...categoryStates.value };
-
-				if (currentState === "ignore") newStates[categoryId] = "include";
-				else if (currentState === "include") newStates[categoryId] = "exclude";
-				else newStates[categoryId] = "ignore";
-
-				categoryStates.value = newStates;
+			const cycleCategoryState = (id) => {
+				if (id ) categoryStates.value = updateKey(categoryStates.value, id, nextCategoryState);
 			};
 
-			const toggleCategoryInclusion = (categoryId) => {
-				if (!categoryId) return;
-
-				const currentState = categoryStates.value[categoryId];
-				const newStates = { ...categoryStates.value };
-				newStates[categoryId] =
-					currentState === "include" ? "ignore" : "include";
-
-				categoryStates.value = newStates;
-			};
-
-			const getCategoryBadge = (state) => {
-				if (state === "include") return "[+] ";
-				if (state === "exclude") return "[-] ";
-				return "";
+			const toggleCategoryInclusion = (id) => {
+				if (id) categoryStates.value = updateKey(categoryStates.value, id, toggleCategoryState);
 			};
 
 			const fetchItems = async (isReset = false) => {
 				if (loading.value && !isReset) return;
 
 				const requestId = ++currentRequestId;
-
 				loading.value = true;
 				errorMessage.value = null;
 
 				const targetPage = isReset ? 0 : page.value;
-				const from = targetPage * PAGE_SIZE;
-				const to = from + PAGE_SIZE - 1;
+				const { from, to } = calculateRange(targetPage, PAGE_SIZE);
 
 				try {
-					const includedIds = Object.keys(categoryStates.value).filter(
-						(id) => categoryStates.value[id] === "include",
-					);
-					const excludedIds = Object.keys(categoryStates.value).filter(
-						(id) => categoryStates.value[id] === "exclude",
-					);
+					const includedIds = getCategoryIdsByState(categoryStates.value, "include");
+					const excludedIds = getCategoryIdsByState(categoryStates.value, "exclude");
 
-					let excludedRecipeIds = [];
-					if (excludedIds.length > 0) {
-						const { data: excludedData, error: excludedErr } = await supabase
-							.from("recipe_categories")
-							.select("recipe_id")
-							.in("category_id", excludedIds);
+					const excludedRecipeIds = await fetchExcludedRecipeIds(supabase, excludedIds);
+					if (requestId !== currentRequestId) return;
 
-						if (requestId !== currentRequestId) return;
-						if (excludedErr) throw excludedErr;
-						if (excludedData && excludedData.length > 0)
-							excludedRecipeIds = [
-								...new Set(excludedData.map((row) => row.recipe_id)),
-							];
-					}
-
-					let selectClause = `
-                        id,
-                        name_key,
-                        description_key,
-                        yield_factor,
-                        created_at,
-                        recipe_categories(category_id, categories(id, code_key)),
-						preparation_steps(step_number, action_key, equipment(id, code_key), effort_type, duration_minutes, is_active),
-						recipe_ingredients(quantity_grams, ingredients(*))
-                    `;
-
-					selectClause += includedIds
-						.map(
-							(_, index) =>
-								`, rc_${index}:recipe_categories!inner(category_id)`,
-						)
-						.join("");
-
-					let query = supabase
-						.from("recipes")
-						.select(selectClause, { count: "exact" });
-
-					includedIds.forEach((id, index) => {
-						query = query.eq(`rc_${index}.category_id`, id);
+					const query = buildRecipesQuery(supabase, {
+						includedIds,
+						excludedRecipeIds,
+						from,
+						to,
 					});
-
-					if (excludedRecipeIds.length > 0)
-						query = query.not("id", "in", `(${excludedRecipeIds.join(",")})`);
-
-					query = query
-						.range(from, to)
-						.order("created_at", { ascending: false });
 
 					const { data, error, count } = await query;
 					if (requestId !== currentRequestId) return;
 					if (error) throw error;
 
-					const formattedData = (data || []).map((recipe) => {
-						if (
-							recipe.recipe_categories &&
-							Array.isArray(recipe.recipe_categories)
+					const sortNutrientKey = (n) => `ui:nutrition.nutrients.${n.key}`;
+					const formattedData = (data || []).map((recipe) => 
+						transformRecipe(recipe, effortLevels, (nutrients) =>
+							sortTranslated(nutrients, sortNutrientKey)
 						)
-							recipe.recipe_categories = sortTranslated(
-								recipe.recipe_categories,
-								(rc) => `categories:${rc.categories?.code_key}`,
-							);
-						if (
-							recipe.recipe_ingredients &&
-							Array.isArray(recipe.recipe_ingredients)
-						)
-							recipe.recipe_ingredients = sortTranslated(
-								recipe.recipe_ingredients,
-								(ri) => `ingredients:${ri.ingredients?.code_key}`,
-							);
-						if (
-							recipe.preparation_steps &&
-							Array.isArray(recipe.preparation_steps)
-						)
-							recipe.preparation_steps = sortBy(
-								recipe.preparation_steps,
-								"step_number",
-							);
+					);
 
-						const totalDuration = (recipe.preparation_steps || []).reduce(
-							(acc, step) => acc + (step.duration_minutes || 0),
-							0,
-						);
-
-						let totalWeight = 0;
-						const totals = {};
-
-						(recipe.recipe_ingredients || []).forEach((ri) => {
-							const qty = Number(ri.quantity_grams) || 0;
-							const ing = ri.ingredients || {};
-							totalWeight += qty;
-
-							Object.entries(ing).forEach(([key, val]) => {
-								if (key.endsWith("_100g") && val !== null) {
-									const nutrientKey = key.replace("_100g", "");
-									const numericVal = Number(val) || 0;
-									totals[nutrientKey] =
-										(totals[nutrientKey] || 0) + (qty / 100) * numericVal;
-								}
-							});
-						});
-
-						const yieldFactor = Number(recipe.yield_factor);
-						const totalYieldGrams = Math.round(totalWeight * yieldFactor);
-
-						const PORTION_WEIGHT = 100;
-						const portionFactor =
-							totalWeight > 0 ? PORTION_WEIGHT / totalWeight : 0;
-
-						const nutrients = sortTranslated(
-							Object.entries(totals)
-								.filter(([_, totalVal]) => totalVal > 0)
-								.map(([key, totalVal]) => ({
-									key,
-									total: totalVal,
-									portion: totalVal * portionFactor,
-								})),
-							(n) => `ui:nutrition.nutrients.${n.key}`,
-						);
-
-						const caloriesNutrient = nutrients.find(
-							(n) => n.key === "calories",
-						);
-						const portionCalories = caloriesNutrient
-							? caloriesNutrient.portion
-							: 0;
-						const difficultyLevel = calculateDifficulty(
-							recipe.preparation_steps,
-							effortLevels,
-						);
-
-						return {
-							...recipe,
-							total_duration_minutes: totalDuration,
-							portion_calories: portionCalories,
-							total_yield_grams: totalYieldGrams,
-							difficulty_level: difficultyLevel,
-							nutrients,
-						};
-					});
-
-					if (isReset) {
-						items.value = formattedData;
-						page.value = 1;
-					} else {
-						items.value = [...items.value, ...formattedData];
-						page.value++;
-					}
-
+					items.value = isReset ? formattedData : [...items.value, ...formattedData];
+					page.value = targetPage + 1;
 					totalCount.value = count;
-					hasMore.value =
-						items.value.length < count && formattedData.length === PAGE_SIZE;
+					hasMore.value = items.value.length < count && formattedData.length === PAGE_SIZE;
 				} catch (err) {
 					errorMessage.value = err.message || "ui:results.connection_error";
 				} finally {
@@ -329,12 +411,7 @@ const PAGE_SIZE = 10;
 					if (error) throw error;
 
 					if (data && Array.isArray(data)) effortLevels = data;
-				} catch (err) {
-					console.error(
-						"Erro ao buscar enum effort_level:",
-						err.message || err,
-					);
-				}
+				} catch (err) {}
 			};
 
 			const formatNutrientValue = (val) => {
@@ -344,104 +421,12 @@ const PAGE_SIZE = 10;
 				return val.toFixed(2);
 			};
 
-			const formatPreparationStep = (rawActionKey) => {
-				if (!rawActionKey) return "";
-
-				const [actionAndTargets, modifierKey] = rawActionKey.split("@");
-				const [action, rawTarget] = actionAndTargets.split("__");
-
-				let modifierText = "";
-				if (modifierKey) {
-					const translatedModifier = t(`modifiers:${modifierKey}`, {
-						defaultValue: modifierKey,
-					});
-					modifierText = ` ${translatedModifier}`;
-				}
-
-				let formattedTargets = "";
-				if (rawTarget) {
-					const targetKeys = rawTarget.split("-and-");
-					const translatedTargets = targetKeys.map((key) =>
-						t(`ingredients:${key}`, { context: "article", defaultValue: key }),
-					);
-
-					const listFormatter = new Intl.ListFormat(currentLocale.value, {
-						style: "long",
-						type: "conjunction",
-					});
-					formattedTargets = listFormatter.format(translatedTargets);
-				}
-
-				return t(`actions:${action}`, {
-					target: formattedTargets,
-					modifier: modifierText,
-					defaultValue: `${action} ${formattedTargets}${modifierText}`.trim(),
-				});
-			};
-
 			const formatGram = (amount, unit) => {
 				return new Intl.NumberFormat(currentLocale.value, {
 					style: "unit",
 					unit: unit,
 					unitDisplay: "narrow",
 				}).format(amount);
-			};
-
-			const formatRecipeEquipment = (steps) => {
-				if (!steps || steps.length === 0) return "";
-
-				const rawKeys = steps
-					.map((s) => s.equipment.code_key)
-					.filter(Boolean)
-					.flatMap((key) => key.split("-and-"));
-				if (rawKeys.length === 0) return "";
-
-				const translatedEquipment = [
-					...new Set(rawKeys.map((key) => t(`equipment:${key}`))),
-				].sort((a, b) => a.localeCompare(b, currentLocale.value));
-
-				const listFormatter = new Intl.ListFormat(currentLocale.value, {
-					style: "long",
-					type: "conjunction",
-				});
-				return listFormatter.format(translatedEquipment);
-			};
-
-			const calculateDifficulty = (steps, effortLevels) => {
-				if (!steps || steps.length === 0) return effortLevels[0];
-
-				const totalTiers = effortLevels.length;
-				const effortWeights = Object.fromEntries(
-					effortLevels.map((level, index) => [level, index]),
-				);
-
-				let activeMinutes = 0;
-				let effortScore = 0;
-				let hasMaxEffort = false;
-
-				steps.forEach((s) => {
-					const weight = effortWeights[s.effort_type];
-					if (weight === totalTiers) hasMaxEffort = true;
-
-					if (s.is_active) {
-						const duration = s.duration_minutes;
-						activeMinutes += duration;
-						effortScore += weight * duration;
-					}
-				});
-
-				const totalScore =
-					activeMinutes + effortScore * 0.5 + steps.length * 0.8;
-				const REFERENCE_MAX_SCORE = 45;
-				const normalizedRatio = Math.min(
-					totalScore / REFERENCE_MAX_SCORE,
-					0.99,
-				);
-				let levelIndex = Math.floor(normalizedRatio * totalTiers);
-
-				if (hasMaxEffort && levelIndex === 0 && totalTiers > 1) levelIndex = 1;
-
-				return effortLevels[levelIndex];
 			};
 
 			const resetAndFetch = async () => await fetchItems(true);
@@ -475,8 +460,7 @@ const PAGE_SIZE = 10;
 			};
 
 			onMounted(async () => {
-				await fetchEffortLevels();
-				await fetchCategories();
+				await Promise.all([fetchEffortLevels(), fetchCategories()]);
 				await fetchItems(true);
 				setupIntersectionObserver();
 			});
@@ -503,7 +487,6 @@ const PAGE_SIZE = 10;
 				resetAndFetch,
 				cycleCategoryState,
 				toggleCategoryInclusion,
-				getCategoryBadge,
 				formatPreparationStep,
 				formatNutrientValue,
 				formatGram,
