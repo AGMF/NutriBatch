@@ -78,9 +78,10 @@ const calculateDifficulty = (steps = [], effortLevels = []) => {
 	const rawRatio = Math.min(totalScore / 45, 0.99);
 	const calculatedIndex = Math.floor(rawRatio * totalTiers);
 
-	const finalIndex = (hasMaxEffort && calculatedIndex === 0 && totalTiers > 1)
-		? 1
-		: calculatedIndex;
+	const finalIndex =
+		hasMaxEffort && calculatedIndex === 0 && totalTiers > 1
+			? 1
+			: calculatedIndex;
 
 	return effortLevels[finalIndex];
 };
@@ -101,7 +102,7 @@ const extractIngredientNutrients = (recipeIngredient) => {
 const computeNutrients = (recipeIngredients = [], sortFn) => {
 	const totalWeight = recipeIngredients.reduce(
 		(sum, ri) => sum + (Number(ri.quantity_grams) || 0),
-		0
+		0,
 	);
 
 	const totals = recipeIngredients
@@ -150,7 +151,9 @@ const transformRecipe = (recipe, effortLevels, sortFn) => {
 		preparation_steps: preparationSteps,
 		total_duration_minutes: totalDurationMinutes,
 		portion_calories: portionCalories,
-		total_yield_grams: Math.round(totalWeight * Number(recipe.yield_factor || 0)),
+		total_yield_grams: Math.round(
+			totalWeight * Number(recipe.yield_factor || 0),
+		),
 		difficulty_level: calculateDifficulty(preparationSteps, effortLevels),
 		nutrients,
 	};
@@ -161,7 +164,7 @@ const getUniqueEquipmentKeys = (steps = []) => [
 		steps
 			.map((s) => s.equipment?.code_key)
 			.filter(Boolean)
-			.flatMap((key) => key.split("-and-"))
+			.flatMap((key) => key.split("-and-")),
 	),
 ];
 
@@ -238,8 +241,9 @@ const BASE_SELECT_FIELDS = `
 
 const buildSelectClause = (includedIds = []) =>
 	includedIds.reduce(
-		(acc, _, index) => `${acc}, rc_${index}:recipe_categories!inner(category_id)`,
-		BASE_SELECT_FIELDS
+		(acc, _, index) =>
+			`${acc}, rc_${index}:recipe_categories!inner(category_id)`,
+		BASE_SELECT_FIELDS,
 	);
 
 const fetchExcludedRecipeIds = async (client, excludedCategoryIds = []) => {
@@ -254,18 +258,24 @@ const fetchExcludedRecipeIds = async (client, excludedCategoryIds = []) => {
 	return [...new Set((data || []).map((row) => row.recipe_id))];
 };
 
-const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], from, to }) => {
+const buildRecipesQuery = (
+	client,
+	{ includedIds = [], excludedRecipeIds = [], from, to },
+) => {
 	const selectClause = buildSelectClause(includedIds);
-	const baseQuery = client.from("recipes").select(selectClause, { count: "exact" });
+	const baseQuery = client
+		.from("recipes")
+		.select(selectClause, { count: "exact" });
 
 	const queryWithIncludes = includedIds.reduce(
 		(query, id, index) => query.eq(`rc_${index}.category_id`, id),
-		baseQuery
+		baseQuery,
 	);
 
-	const queryWithExcludes = excludedRecipeIds.length > 0
-		? queryWithIncludes.not("id", "in", `(${excludedRecipeIds.join(",")})`)
-		: queryWithIncludes;
+	const queryWithExcludes =
+		excludedRecipeIds.length > 0
+			? queryWithIncludes.not("id", "in", `(${excludedRecipeIds.join(",")})`)
+			: queryWithIncludes;
 
 	return queryWithExcludes
 		.range(from, to)
@@ -282,7 +292,8 @@ const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], f
 
 			const applyGlobalSorting = () => {
 				const categorySortKey = (c) => `categories:${c.code_key}`;
-				const ingredientSortKey = (ri) => `ingredients:${ri.ingredients?.code_key}`;
+				const ingredientSortKey = (ri) =>
+					`ingredients:${ri.ingredients?.code_key}`;
 				const nutrientSortKey = (n) => `ui:nutrition.nutrients.${n.key}`;
 
 				if (categories.value.length > 0)
@@ -291,7 +302,10 @@ const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], f
 				if (items.value.length > 0) {
 					items.value = items.value.map((recipe) => ({
 						...recipe,
-						recipe_ingredients: sortTranslated(recipe.recipe_ingredients, ingredientSortKey),
+						recipe_ingredients: sortTranslated(
+							recipe.recipe_ingredients,
+							ingredientSortKey,
+						),
 						nutrients: sortTranslated(recipe.nutrients, nutrientSortKey),
 					}));
 				}
@@ -303,9 +317,12 @@ const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], f
 				applyGlobalSorting();
 			};
 
-			const durationFormatter = computed(() => createDurationFormatter(currentLocale.value));
+			const durationFormatter = computed(() =>
+				createDurationFormatter(currentLocale.value),
+			);
 
-			const formatDuration = (totalMinutes) => durationFormatter.value(totalMinutes);
+			const formatDuration = (totalMinutes) =>
+				durationFormatter.value(totalMinutes);
 
 			const items = shallowRef([]);
 			const categories = shallowRef([]);
@@ -352,11 +369,21 @@ const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], f
 			};
 
 			const cycleCategoryState = (id) => {
-				if (id ) categoryStates.value = updateKey(categoryStates.value, id, nextCategoryState);
+				if (id)
+					categoryStates.value = updateKey(
+						categoryStates.value,
+						id,
+						nextCategoryState,
+					);
 			};
 
 			const toggleCategoryInclusion = (id) => {
-				if (id) categoryStates.value = updateKey(categoryStates.value, id, toggleCategoryState);
+				if (id)
+					categoryStates.value = updateKey(
+						categoryStates.value,
+						id,
+						toggleCategoryState,
+					);
 			};
 
 			const fetchItems = async (isReset = false) => {
@@ -370,10 +397,19 @@ const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], f
 				const { from, to } = calculateRange(targetPage, PAGE_SIZE);
 
 				try {
-					const includedIds = getCategoryIdsByState(categoryStates.value, "include");
-					const excludedIds = getCategoryIdsByState(categoryStates.value, "exclude");
+					const includedIds = getCategoryIdsByState(
+						categoryStates.value,
+						"include",
+					);
+					const excludedIds = getCategoryIdsByState(
+						categoryStates.value,
+						"exclude",
+					);
 
-					const excludedRecipeIds = await fetchExcludedRecipeIds(supabase, excludedIds);
+					const excludedRecipeIds = await fetchExcludedRecipeIds(
+						supabase,
+						excludedIds,
+					);
 					if (requestId !== currentRequestId) return;
 
 					const query = buildRecipesQuery(supabase, {
@@ -388,16 +424,19 @@ const buildRecipesQuery = (client, { includedIds = [], excludedRecipeIds = [], f
 					if (error) throw error;
 
 					const sortNutrientKey = (n) => `ui:nutrition.nutrients.${n.key}`;
-					const formattedData = (data || []).map((recipe) => 
+					const formattedData = (data || []).map((recipe) =>
 						transformRecipe(recipe, effortLevels, (nutrients) =>
-							sortTranslated(nutrients, sortNutrientKey)
-						)
+							sortTranslated(nutrients, sortNutrientKey),
+						),
 					);
 
-					items.value = isReset ? formattedData : [...items.value, ...formattedData];
+					items.value = isReset
+						? formattedData
+						: [...items.value, ...formattedData];
 					page.value = targetPage + 1;
 					totalCount.value = count;
-					hasMore.value = items.value.length < count && formattedData.length === PAGE_SIZE;
+					hasMore.value =
+						items.value.length < count && formattedData.length === PAGE_SIZE;
 				} catch (err) {
 					errorMessage.value = err.message || "ui:results.connection_error";
 				} finally {
