@@ -1,4 +1,9 @@
 {
 	"low-heat-covered": "em fogo baixo com a panela tampada",
-	"covered-off-heat": "com a panela tampada, fora do fogo"
+	"covered-off-heat": "com a panela tampada, fora do fogo",
+	"medium-heat": "em fogo médio",
+	"medium-high-heat": "em fogo médio-alto",
+	"in-pressure-cooker": "na panela de pressão",
+	"low-heat-uncovered": "em fogo baixo com a panela destampada",
+	"off-heat": "fora do fogo"
 }

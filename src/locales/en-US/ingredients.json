@@ -11,5 +11,16 @@
 	"onion_article": "the onion",
 	"salt": "salt",
 	"salt_article": "the salt",
-	"grains_article": "the grains"
+	"grains_article": "the grains",
+	"cauliflower": "cauliflower",
+	"cauliflower_article": "the cauliflower",
+	"pinto-beans": "pinto beans",
+	"pinto-beans_article": "the pinto beans",
+	"cooked-beans_article": "the cooked beans",
+	"beans_article": "the beans",
+	"bay-leaf": "bay leaf",
+	"bay-leaf_article": "the bay leaf",
+	"chicken-breast": "chicken breast",
+	"chicken-breast_article": "the chicken breast",
+	"black-pepper": "black pepper"
 }

@@ -1,4 +1,9 @@
 {
 	"low-heat-covered": "over low heat, covered",
-	"covered-off-heat": "covered, off the heat"
+	"covered-off-heat": "covered, off the heat",
+	"medium-heat": "over medium heat",
+	"medium-high-heat": "over medium-high heat",
+	"in-pressure-cooker": "in the pressure cooker",
+	"low-heat-uncovered": "over low heat, uncovered",
+	"off-heat": "off the heat"
 }

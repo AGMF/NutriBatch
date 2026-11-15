@@ -1,10 +1,16 @@
 {
 	"boil": "Boil {{target}}",
-	"saute": "Sauté {{target}}",
+	"saute": "Sauté {{target}}{{modifier}}",
 	"toast": "Toast {{target}}",
 	"add": "Add {{target}}",
 	"simmer": "Simmer {{target}}{{modifier}}",
 	"rest": "Let rest{{modifier}}",
 	"fluff-and-serve": "Fluff {{target}} and serve",
-	"chop": "Chop {{target}}"
+	"chop": "Chop {{target}}",
+	"grate": "Grate {{target}}",
+	"cook": "Cook {{target}}{{modifier}}",
+	"serve": "Serve {{target}}",
+	"season": "Season {{target}}",
+	"sear": "Sear {{target}}{{modifier}}",
+	"slice": "Slice {{target}}"
 }

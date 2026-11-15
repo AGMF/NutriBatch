@@ -11,5 +11,16 @@
 	"onion_article": "a cebola",
 	"salt": "sal",
 	"salt_article": "o sal",
-	"grains_article": "os grãos"
+	"grains_article": "os grãos",
+	"cauliflower": "couve-flor",
+	"cauliflower_article": "a couve-flor",
+	"pinto-beans": "feijão carioca",
+	"pinto-beans_article": "o feijão carioca",
+	"cooked-beans_article": "o feijão cozido",
+	"beans_article": "o feijão",
+	"bay-leaf": "folha de louro",
+	"bay-leaf_article": "a folha de louro",
+	"chicken-breast": "peito de frango",
+	"chicken-breast_article": "o peito de frango",
+	"black-pepper": "pimenta-do-reino"
 }

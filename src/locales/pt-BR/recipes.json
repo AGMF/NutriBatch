@@ -2,5 +2,17 @@
 	"white-rice": {
 		"title": "Arroz Branco",
 		"description": "Arroz tradicional refogado com alho e cebola."
+	},
+	"cauliflower-rice": {
+		"title": "Arroz de Couve-Flor",
+		"description": "Contraparte low-carb e cetogênica do arroz branco, refogada com alho e cebola."
+	},
+	"seasoned-pinto-beans": {
+		"title": "Feijão Carioca Temperado",
+		"description": "Acompanhamento clássico do arroz branco, cozido com louro e refogado no alho e cebola."
+	},
+	"garlic-grilled-chicken-breast": {
+		"title": "Filé de Frango Grelhado com Alho",
+		"description": "Filé de peito de frango suculento temperado com alho, ideal para acompanhar o arroz branco ou refeições low-carb."
 	}
 }

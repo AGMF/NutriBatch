@@ -1,10 +1,16 @@
 {
 	"boil": "Ferva {{target}}",
-	"saute": "Refogue {{target}}",
+	"saute": "Refogue {{target}}{{modifier}}",
 	"toast": "Toste {{target}}",
 	"add": "Adicione {{target}}",
 	"simmer": "Cozinhe {{target}}{{modifier}}",
 	"rest": "Deixe descansar{{modifier}}",
 	"fluff-and-serve": "Solte {{target}} e sirva",
-	"chop": "Pique {{target}}"
+	"chop": "Pique {{target}}",
+	"grate": "Rale {{target}}",
+	"cook": "Cozinhe {{target}}{{modifier}}",
+	"serve": "Sirva {{target}}",
+	"season": "Tempere {{target}}",
+	"sear": "Grelhe {{target}}{{modifier}}",
+	"slice": "Fatie {{target}}"
 }

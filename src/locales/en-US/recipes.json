@@ -2,5 +2,17 @@
 	"white-rice": {
 		"title": "White Rice",
 		"description": "Classic white rice seasoned with sautéed garlic and onion."
+	},
+	"cauliflower-rice": {
+		"title": "Cauliflower Rice",
+		"description": "Low-carb and keto-friendly counterpart to white rice, sautéed with garlic and onion."
+	},
+	"seasoned-pinto-beans": {
+		"title": "Seasoned Pinto Beans",
+		"description": "Classic companion to white rice, pressure-cooked with bay leaf and finished with sautéed garlic and onion."
+	},
+	"garlic-grilled-chicken-breast": {
+		"title": "Garlic Grilled Chicken Breast",
+		"description": "Juicy garlic-seasoned chicken breast fillet, ideal alongside white rice or as a low-carb main."
 	}
 }
