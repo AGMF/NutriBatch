@@ -335,16 +335,24 @@ const buildRecipesQuery = (
 			const loading = ref(false);
 			const loadingCategories = ref(true);
 			const errorMessage = ref(null);
+			const categoriesError = ref(null);
 
 			const sentinel = useTemplateRef("sentinel");
+			const resultsHeading = useTemplateRef("resultsHeading");
 			let observer = null;
 
 			let currentRequestId = 0;
 			let debounceTimer = null;
 			let effortLevels = [];
 
+			const friendlyError = (err) => {
+				if (err.message?.includes("Failed to fetch")) return "ui:errors.network";
+				return "ui:errors.unknown";
+			};
+
 			const fetchCategories = async () => {
 				try {
+					categoriesError.value = null;
 					loadingCategories.value = true;
 					const { data, error } = await supabase
 						.from("categories")
@@ -362,7 +370,7 @@ const buildRecipesQuery = (
 						fetchedCategories.map((c) => [c.id, "ignore"]),
 					);
 				} catch (err) {
-					errorMessage.value = err.message;
+					categoriesError.value = err.message;
 				} finally {
 					loadingCategories.value = false;
 				}
@@ -468,7 +476,11 @@ const buildRecipesQuery = (
 				}).format(amount);
 			};
 
-			const resetAndFetch = async () => await fetchItems(true);
+			const resetAndFetch = async () => {
+				await fetchItems(true);
+				resultsHeading.value?.scrollIntoView({ behavior: "smooth", block: "start" });
+				resultsHeading.value?.focus({ preventScroll: true });
+			};
 
 			const clearFilters = () =>
 				(categoryStates.value = Object.fromEntries(
@@ -481,8 +493,7 @@ const buildRecipesQuery = (
 					if (loadingCategories.value) return;
 					if (debounceTimer) clearTimeout(debounceTimer);
 					debounceTimer = setTimeout(() => resetAndFetch(), 500);
-				},
-				{ deep: true },
+				}
 			);
 
 			const setupIntersectionObserver = () => {
@@ -519,6 +530,8 @@ const buildRecipesQuery = (
 				loading,
 				loadingCategories,
 				errorMessage,
+				categoriesError,
+				friendlyError,
 				hasMore,
 				totalCount,
 				sentinel,

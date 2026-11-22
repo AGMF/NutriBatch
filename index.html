@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>NutriBatch</title>
     <meta name="description">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net 'sha256-v3mvQZxymjBuNvGIp7QOMT4sboDaSC1kxGBgkncOdgQ='; style-src 'self'; connect-src 'self' https://ecwvgqzzmxnngfhjlejk.supabase.co https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self';">
@@ -33,146 +33,204 @@
     <script src="src/main.js" type="module"></script>
 </head>
 <body>
-    <div id="app" v-cloak>
-        <header>
-            <h1><a href="/">NutriBatch</a></h1>
-            <nav>
-                <button v-for="locale in getSupportedLocales()" :key="locale" type="button" :disabled="currentLocale === locale" @click="setLocale(locale)">{{ locale }}</button>
+    <a class="skip-link" href="#main">{{ $t('ui:app.skip_link') }}</a>
+    <div id="app" class="app" v-cloak>
+        <header class="app-header">
+            <h1 class="app-brand">
+                <a href="/" class="app-brand__link">NutriBatch</a>
+            </h1>
+            <nav class="locale-switcher" aria-label="{{ $t('ui:app.language_switcher') }}">
+                <button
+                    v-for="locale in getSupportedLocales()"
+                    :key="locale"
+                    class="locale-btn"
+                    type="button"
+                    :disabled="currentLocale === locale"
+                    :aria-current="currentLocale === locale ? 'true' : undefined"
+                    @click="setLocale(locale)">{{ locale }}</button>
             </nav>
         </header>
 
-        <main>
-            <section>
-                <h2>{{ $t('ui:filters.title') }}</h2>
-                <form @submit.prevent>
-                    <fieldset>
-                        <legend>{{ $t('ui:categories.title') }}</legend>
+        <main id="main" class="app-main" tabindex="-1">
+            <section class="filters" aria-labelledby="filters-title">
+                <h2 id="filters-title" class="section-title">{{ $t('ui:filters.title') }}</h2>
 
-                        <p v-if="loadingCategories">{{ $t('ui:categories.loading') }}</p>
-                        <p v-else-if="categories.length === 0">{{ $t('ui:categories.none_found') }}</p>
+                <form class="filters__form" @submit.prevent>
+                    <fieldset class="filters__group">
+                        <legend class="filters__legend">{{ $t('ui:categories.title') }}</legend>
+
+                        <p v-if="loadingCategories" class="status filters__status" role="status" aria-busy="true">
+                            {{ $t('ui:categories.loading') }}
+                        </p>
+
+                        <div v-else-if="categoriesError" class="alert filters__alert" role="alert">
+                            <p class="alert__message">
+                                {{ $t('ui:categories.error', { error: $t(friendlyError(categoriesError)) }) }}
+                            </p>
+                            <button class="alert__retry" type="button" @click="fetchCategories">{{ $t('ui:actions.retry') }}</button>
+                        </div>
+
+                        <p v-else-if="categories.length === 0" class="empty-state">
+                            {{ $t('ui:categories.none_found') }}
+                        </p>
 
                         <template v-else>
-                            <div v-for="category in categories" :key="category.id">
-                                <button type="button" :aria-pressed="categoryStates[category.id] === 'include' ? 'true' : categoryStates[category.id] === 'exclude' ? 'mixed' : 'false'" :aria-label="$t('ui:filters.category_aria', { name: $t(`categories:${category.code_key}`), state: $t(`ui:filters.states.${categoryStates[category.id]}`) })" @click="cycleCategoryState(category.id)">
-                                    <span aria-hidden="true">
-                                        <template v-if="categoryStates[category.id] === 'include'">[✓]</template>
-                                        <template v-else-if="categoryStates[category.id] === 'exclude'">[✗]</template>
-                                        <template v-else>[ ]</template>
-                                    </span>
-                                    <span>{{ $t(`categories:${category.code_key}`) }}</span>
-                                </button>
-                            </div>
+                            <ul class="filters__list">
+                                <li v-for="category in categories" :key="category.id" class="filters__list-item">
+                                    <button
+                                        class="filters__chip"
+                                        type="button"
+                                        :aria-pressed="categoryStates[category.id] === 'include' ? 'true' : categoryStates[category.id] === 'exclude' ? 'mixed' : 'false'"
+                                        :aria-label="$t('ui:filters.category_aria', { name: $t(`categories:${category.code_key}`), state: $t(`ui:filters.states.${categoryStates[category.id]}`) })"
+                                        @click="cycleCategoryState(category.id)">
+                                        <span class="filters__chip-box" aria-hidden="true"></span>
+                                        <span class="filters__chip-label">{{ $t(`categories:${category.code_key}`) }}</span>
+                                    </button>
+                                </li>
+                            </ul>
 
-                            <br />
-                            <button type="button" @click="clearFilters" :disabled="Object.keys(categoryStates).length === 0">{{ $t('ui:filters.clear') }}</button>
+                            <button
+                                class="filters__clear"
+                                type="button"
+                                @click="clearFilters"
+                                :disabled="!Object.values(categoryStates).some(s => s !== 'ignore')">
+                                {{ $t('ui:filters.clear') }}
+                            </button>
                         </template>
                     </fieldset>
                 </form>
             </section>
 
-            <section>
-                <h2>{{ $t('ui:results.title') }}</h2>
+            <section class="results" aria-labelledby="results-title" :aria-busy="loading">
+                <h2 id="results-title" class="section-title" tabindex="-1" ref="resultsHeading">{{ $t('ui:results.title') }}</h2>
 
-                <div v-if="errorMessage" role="alert">
-                    <p>{{ $t('ui:results.error', { error: $t(errorMessage) }) }}</p>
-                    <button type="button" @click="resetAndFetch">{{ $t('ui:actions.retry') }}</button>
+                <div v-if="errorMessage" class="alert" role="alert">
+                    <p class="alert__message">{{ $t('ui:results.error', { error: $t(friendlyError(errorMessage)) }) }}</p>
+                    <button class="alert__retry" type="button" @click="resetAndFetch">{{ $t('ui:actions.retry') }}</button>
                 </div>
 
                 <template v-else>
-                    <p v-if="totalCount !== null">
-                        <output>{{ totalCount }}</output> {{ $t('ui:results.found', { count: totalCount }) }}
+                    <p v-if="totalCount !== null" class="results__count" aria-live="polite" aria-atomic="true">
+                        <output class="results__count-badge">{{ totalCount }}</output>
+                        {{ $t('ui:results.found', { count: totalCount }) }}
                     </p>
 
-                    <p v-if="!loading && items.length === 0">{{ $t('ui:results.none_found') }}</p>
+                    <p v-if="!loading && items.length === 0" class="empty-state">
+                        {{ $t('ui:results.none_found') }}
+                    </p>
 
-                    <div v-else>
-                        <article v-for="item in items" :key="item.id">
-                            <h3>{{ $t(`recipes:${item.name_key}`) }}</h3>
+                    <div v-else class="results__grid">
+                        <article v-for="item in items" :key="item.id" class="card">
+                            <h3 class="card__title">{{ $t(`recipes:${item.name_key}`) }}</h3>
 
-                            <div>
-                                <strong>{{ $t('ui:categories.title') }}</strong>
+                            <div class="card__categories">
+                                <strong class="card__categories-label">{{ $t('ui:categories.title') }}</strong>
                                 <template v-if="item.recipe_categories && item.recipe_categories.length > 0">
-                                    <button v-for="rc in item.recipe_categories" :key="rc.categories?.id" type="button" :aria-pressed="categoryStates[rc.categories?.id] === 'include'" @click="toggleCategoryInclusion(rc.categories?.id)">
-                                        <span v-if="categoryStates[rc.categories?.id] === 'include'">✓ </span>
+                                    <button
+                                        v-for="rc in item.recipe_categories"
+                                        :key="rc.categories?.id"
+                                        class="card__category-chip"
+                                        type="button"
+                                        :aria-pressed="categoryStates[rc.categories?.id] === 'include'"
+                                        @click="toggleCategoryInclusion(rc.categories?.id)">
                                         {{ $t(`categories:${rc.categories?.code_key}`) }}
                                     </button>
                                 </template>
-                                <span v-else>{{ $t('ui:categories.none_assigned') }}</span>
+                                <span v-else class="card__categories-empty">{{ $t('ui:categories.none_assigned') }}</span>
                             </div>
-                            <p>{{ $t(`recipes:${item.description_key}`) }}</p>
-                            <ul>
-                                <li><strong>{{ $t('ui:recipe.total_time') }}</strong> {{ formatDuration(item.total_duration_minutes) }}</li>
-                                <li><strong>{{ $t('ui:recipe.difficulty_label') }}</strong> {{ $t(`ui:recipe.difficulty.${item.difficulty_level}`) }}</li>
-                                <li><strong>{{ $t('ui:recipe.equipment', { count: item.preparation_steps?.length || 0 }) }}</strong> {{ formatRecipeEquipment(item.preparation_steps, currentLocale, $t) }}</li>
-                                <li><strong>{{ $t('ui:recipe.portion_size') }}</strong> {{ formatGram(100, 'gram') }}</li>
-                                <li><strong>{{ $t('ui:recipe.calories_per_portion') }}</strong> {{ item.portion_calories.toFixed(0) }} kcal</li>
+                            <p class="card__description">{{ $t(`recipes:${item.description_key}`) }}</p>
+                            <ul class="card__metrics">
+                                <li class="card__metric">
+                                    <strong class="card__metric-label">{{ $t('ui:recipe.total_time') }}</strong>
+                                    {{ formatDuration(item.total_duration_minutes) }}
+                                </li>
+                                <li class="card__metric">
+                                    <strong class="card__metric-label">{{ $t('ui:recipe.difficulty_label') }}</strong>
+                                    {{ $t(`ui:recipe.difficulty.${item.difficulty_level}`) }}
+                                </li>
+                                <li class="card__metric">
+                                    <strong class="card__metric-label">{{ $t('ui:recipe.equipment', { count: item.preparation_steps?.length || 0 }) }}</strong>
+                                    {{ formatRecipeEquipment(item.preparation_steps, currentLocale, $t) }}
+                                </li>
+                                <li class="card__metric">
+                                    <strong class="card__metric-label">{{ $t('ui:recipe.portion_size') }}</strong>
+                                    {{ formatGram(100, 'gram') }}
+                                </li>
+                                <li class="card__metric">
+                                    <strong class="card__metric-label">{{ $t('ui:recipe.calories_per_portion') }}</strong>
+                                    {{ item.portion_calories.toFixed(0) }} kcal
+                                </li>
                             </ul>
 
-                            <details>
-                                <summary><strong>{{ $t('ui:recipe.ingredients_title') }}</strong></summary>
-                                <ul>
-                                    <li v-for="ri in item.recipe_ingredients" :key="ri.ingredients?.id">
+                            <details class="card__section">
+                                <summary class="card__summary"><strong>{{ $t('ui:recipe.ingredients_title') }}</strong></summary>
+                                <ul class="card__ingredients">
+                                    <li v-for="ri in item.recipe_ingredients" :key="ri.ingredients?.id" class="card__ingredient">
                                         {{ $t('ui:recipe.ingredient_item', { quantity: formatGram(ri.quantity_grams, ri.ingredients.unit), name: $t(`ingredients:${ri.ingredients?.code_key}`) }) }}
                                     </li>
                                 </ul>
                             </details>
 
-                            <details>
-                                <summary><strong>{{ $t('ui:recipe.steps_title') }}</strong></summary>
-                                <ol>
-                                    <li v-for="step in item.preparation_steps" :key="step.step_number">
-                                        <p>
+                            <details class="card__section">
+                                <summary class="card__summary"><strong>{{ $t('ui:recipe.steps_title') }}</strong></summary>
+                                <ol class="card__steps">
+                                    <li v-for="step in item.preparation_steps" :key="step.step_number" class="card__step">
+                                        <p class="card__step-text">
                                             {{ formatPreparationStep(step.action_key, currentLocale, $t) }}
-                                            <span v-if="step.duration_minutes > 0">({{ formatDuration(step.duration_minutes) }})</span>
+                                            <span v-if="step.duration_minutes > 0" class="card__step-duration">({{ formatDuration(step.duration_minutes) }})</span>
                                             <template v-if="step.equipment">
-                                                — <small><strong>{{ $t('ui:recipe.equipment', { count: 1 }) }}</strong> {{ $t(`equipment:${step.equipment.code_key}`) }}</small>
+                                                — <small class="card__step-equipment"><strong>{{ $t('ui:recipe.equipment', { count: 1 }) }}</strong> {{ $t(`equipment:${step.equipment.code_key}`) }}</small>
                                             </template>
                                         </p>
                                     </li>
                                 </ol>
                             </details>
 
-                            <details>
-                                <summary><strong>{{ $t('ui:nutrition.title') }}</strong></summary>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>{{ $t('ui:nutrition.nutrient') }}</th>
-                                            <th>{{ $t('ui:nutrition.per_portion') }} ({{ formatGram(100, 'gram') }})</th>
-                                            <th>{{ $t('ui:nutrition.total_recipe') }} ({{ formatGram(item.total_yield_grams, 'gram') }})</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="nut in item.nutrients" :key="nut.key">
-                                            <td>{{ $t(`ui:nutrition.nutrients.${nut.key}`) }}</td>
-                                            <td>
-                                                {{ formatNutrientValue(nut.portion) }}
-                                                {{ $t(`ui:nutrition.units.${nut.key}`, { defaultValue: 'g' }) }}
-                                            </td>
-                                            <td>
-                                                {{ formatNutrientValue(nut.total) }}
-                                                {{ $t(`ui:nutrition.units.${nut.key}`, { defaultValue: 'g' }) }}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <details class="card__section">
+                                <summary class="card__summary"><strong>{{ $t('ui:nutrition.title') }}</strong></summary>
+                                <div class="card__table-clip">
+                                    <div class="card__table-scroll">
+                                        <table class="card__nutrition">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ $t('ui:nutrition.nutrient') }}</th>
+                                                    <th>{{ $t('ui:nutrition.per_portion') }} ({{ formatGram(100, 'gram') }})</th>
+                                                    <th>{{ $t('ui:nutrition.total_recipe') }} ({{ formatGram(item.total_yield_grams, 'gram') }})</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="nut in item.nutrients" :key="nut.key">
+                                                    <td>{{ $t(`ui:nutrition.nutrients.${nut.key}`) }}</td>
+                                                    <td>
+                                                        {{ formatNutrientValue(nut.portion) }}
+                                                        {{ $t(`ui:nutrition.units.${nut.key}`, { defaultValue: 'g' }) }}
+                                                    </td>
+                                                    <td>
+                                                        {{ formatNutrientValue(nut.total) }}
+                                                        {{ $t(`ui:nutrition.units.${nut.key}`, { defaultValue: 'g' }) }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </details>
                         </article>
                     </div>
 
-                    <div ref="sentinel">
-                        <p v-if="loading" role="status" aria-busy="true">{{ $t('ui:results.loading_more') }}</p>
-                        <p v-else-if="!hasMore && items.length > 0">{{ $t('ui:results.end') }}</p>
+                    <div class="results__sentinel" ref="sentinel">
+                        <p v-if="loading" class="status" role="status" aria-busy="true">{{ $t('ui:results.loading_more') }}</p>
+                        <p v-else-if="!hasMore && items.length > 0" class="results__end">{{ $t('ui:results.end') }}</p>
                     </div>
                 </template>
             </section>
         </main>
-        <footer>
+        <footer class="app-footer">
             <small>{{ $t('ui:app.legal') }}</small>
         </footer>
     </div>
     <noscript>
-        <p role="alert">O NutriBatch precisa do JavaScript habilitado para funcionar corretamente.</p>
+        <p class="noscript-notice" role="alert">O NutriBatch precisa do JavaScript habilitado para funcionar corretamente.</p>
     </noscript>
 </body>
 </html>
