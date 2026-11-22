@@ -24,7 +24,7 @@
 	},
 	"overrides": [
 		{
-			"include": ["css/main.css"],
+			"includes": ["css/main.css"],
 			"linter": {
 				"rules": {
 					"complexity": {
