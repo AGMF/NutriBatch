@@ -17,11 +17,8 @@ import {
 	sortTranslated,
 	useTranslation,
 } from "./i18n.js";
+import { supabase } from "./lib/supabase.js";
 import {
-	supabase
-} from "./lib/supabase.js";
-import {
-	PAGE_SIZE,
 	buildRecipesQuery,
 	calculateRange,
 	createDurationFormatter,
@@ -30,6 +27,7 @@ import {
 	formatRecipeEquipment,
 	getCategoryIdsByState,
 	nextCategoryState,
+	PAGE_SIZE,
 	toggleCategoryState,
 	transformRecipe,
 	updateKey,
