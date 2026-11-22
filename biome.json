@@ -8,7 +8,30 @@
 		"rules": {
 			"a11y": {
 				"useHtmlLang": "off"
+			},
+			"correctness": {
+				"noUnknownFunction": {
+					"level": "error",
+					"options": {
+						"ignore": ["random"]
+					}
+				}
+			},
+			"complexity": {
+				"noImportantStyles": "error"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"include": ["css/main.css"],
+			"linter": {
+				"rules": {
+					"complexity": {
+						"noImportantStyles": "off"
+					}
+				}
+			}
+		}
+	]
 }

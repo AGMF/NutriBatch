@@ -675,6 +675,13 @@
 		transition: opacity var(--dur) var(--ease);
 	}
 
+	.results__grid {
+		display: grid;
+		gap: clamp(0.9rem, 2.5vw, 1.5rem);
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 23rem), 1fr));
+		align-items: start;
+	}
+
 	.results[aria-busy="true"] .results__grid {
 		opacity: 0.55;
 		pointer-events: none;
@@ -696,13 +703,6 @@
 		color: light-dark(var(--text), var(--accent));
 		background: color-mix(in oklch, var(--accent) 16%, transparent);
 		border-radius: var(--radius-full);
-	}
-
-	.results__grid {
-		display: grid;
-		gap: clamp(0.9rem, 2.5vw, 1.5rem);
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 23rem), 1fr));
-		align-items: start;
 	}
 
 	.results__sentinel {

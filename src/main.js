@@ -287,7 +287,7 @@ const buildRecipesQuery = (
 
 	const app = createApp({
 		setup() {
-			const { i18next: i18n, t } = useTranslation();
+			const { i18next: i18n } = useTranslation();
 			const currentLocale = ref(i18n.resolvedLanguage);
 
 			const applyGlobalSorting = () => {
@@ -458,7 +458,7 @@ const buildRecipesQuery = (
 					if (error) throw error;
 
 					if (data && Array.isArray(data)) effortLevels = data;
-				} catch (err) {}
+				} catch (_err) {}
 			};
 
 			const formatNutrientValue = (val) => {
