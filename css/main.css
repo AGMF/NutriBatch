@@ -81,18 +81,18 @@
 		--step-1: clamp(1.15rem, 1.07rem + 0.4vw, 1.375rem);
 		--step-2: clamp(1.4rem, 1.25rem + 0.75vw, 1.875rem);
 
-		--bg: light-dark(oklch(97.4% 0.008 295), oklch(16.5% 0.030 280));
-		--surface: light-dark(oklch(100% 0 0),       oklch(21.5% 0.032 300));
-		--surface-2: light-dark(oklch(97.8% 0.010 295), oklch(25.0% 0.034 322));
+		--bg: light-dark(oklch(97.4% 0.008 295), oklch(16.5% 0.03 280));
+		--surface: light-dark(oklch(100% 0 0), oklch(21.5% 0.032 300));
+		--surface-2: light-dark(oklch(97.8% 0.01 295), oklch(25.0% 0.034 322));
 
-		--text: light-dark(oklch(23% 0.020 300), oklch(94% 0.010 320));
+		--text: light-dark(oklch(23% 0.02 300), oklch(94% 0.01 320));
 		--text-muted: light-dark(oklch(43% 0.015 300), oklch(75% 0.013 315));
 
 		--border: light-dark(oklch(88% 0.015 295), oklch(31% 0.028 308));
-		--border-strong: light-dark(oklch(78% 0.020 295), oklch(42% 0.030 314));
+		--border-strong: light-dark(oklch(78% 0.02 295), oklch(42% 0.03 314));
 
 		--primary: light-dark(oklch(48% 0.17 300), oklch(78% 0.13 300));
-		--primary-ink: light-dark(oklch(32% 0.10 300), oklch(92% 0.06 300));
+		--primary-ink: light-dark(oklch(32% 0.1 300), oklch(92% 0.06 300));
 		--primary-contrast: light-dark(oklch(99% 0 0), oklch(20% 0.04 300));
 
 		--primary-deco: light-dark(oklch(48% 0.17 300), oklch(70% 0.11 300));
@@ -100,7 +100,7 @@
 
 		--accent: light-dark(oklch(60% 0.13 195), oklch(78% 0.11 195));
 
-		--danger: light-dark(oklch(55% 0.20 20), oklch(72% 0.16 20));
+		--danger: light-dark(oklch(55% 0.2 20), oklch(72% 0.16 20));
 		--danger-ink: light-dark(oklch(42% 0.16 20), oklch(90% 0.06 20));
 		--danger-contrast: light-dark(oklch(99% 0 0), oklch(22% 0.04 20));
 
@@ -109,11 +109,12 @@
 		--radius-lg: 1.25rem;
 		--radius-full: 999px;
 
-		--shadow-sm:
-			0 1px 2px light-dark(oklch(0% 0 0 / 0.05), oklch(0% 0 0 / 0.35));
+		--shadow-sm: 0 1px 2px
+			light-dark(oklch(0% 0 0 / 0.05), oklch(0% 0 0 / 0.35));
 		--shadow-md:
 			0 1px 2px light-dark(oklch(0% 0 0 / 0.05), oklch(0% 0 0 / 0.35)),
-			0 12px 32px -18px light-dark(oklch(20% 0.03 150 / 0.35), oklch(0% 0 0 / 0.6));
+			0 12px 32px -18px
+			light-dark(oklch(20% 0.03 150 / 0.35), oklch(0% 0 0 / 0.6));
 
 		--ease: cubic-bezier(0.22, 1, 0.36, 1);
 		--dur: 200ms;
@@ -143,7 +144,7 @@
 }
 
 @layer base {
-	*{
+	* {
 		scrollbar-width: thin;
 		scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 	}
@@ -162,7 +163,6 @@
 
 	::selection {
 		background: color-mix(in oklch, var(--primary) 32%, transparent);
-
 	}
 
 	a,
@@ -325,7 +325,7 @@
 		color: var(--danger-ink);
 		text-align: center;
 	}
-	
+
 	button {
 		border-radius: var(--radius-full);
 		font-weight: 600;
@@ -453,7 +453,11 @@
 		inline-size: 0.28em;
 		block-size: 0.95em;
 		border-radius: var(--radius-full);
-		background: linear-gradient(to bottom, var(--primary-deco), var(--accent-deco));
+		background: linear-gradient(
+			to bottom,
+			var(--primary-deco),
+			var(--accent-deco)
+		);
 	}
 
 	.filters {
@@ -720,7 +724,7 @@
 		--hue-shift: 0;
 
 		--grad-a: hsl(from var(--primary) calc(h + var(--hue-shift)) s l);
-		--grad-b: hsl(from var(--accent)  calc(h + var(--hue-shift)) s l);
+		--grad-b: hsl(from var(--accent) calc(h + var(--hue-shift)) s l);
 
 		position: relative;
 		display: grid;
@@ -731,8 +735,12 @@
 		min-inline-size: 0;
 		container-type: inline-size;
 		background-color: var(--surface);
-		background-image:
-			linear-gradient(90deg, var(--grad-a), var(--grad-b) 55%, transparent);
+		background-image: linear-gradient(
+			90deg,
+			var(--grad-a),
+			var(--grad-b) 55%,
+			transparent
+		);
 		background-repeat: no-repeat;
 		background-position: top;
 		background-size: 100% 0.28em;
@@ -755,8 +763,7 @@
 
 	@supports (width: random(0px, 1px)) {
 		.card {
-			--hue-shift:
-				random(calc(-1 * var(--hue-spread)), var(--hue-spread));
+			--hue-shift: random(calc(-1 * var(--hue-spread)), var(--hue-spread));
 		}
 	}
 
@@ -1031,7 +1038,8 @@
 	}
 
 	.card__nutrition tbody tr + tr > * {
-		border-block-start: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+		border-block-start: 1px solid
+			color-mix(in oklch, var(--border) 60%, transparent);
 	}
 
 	@container (min-width: 30rem) {
@@ -1071,20 +1079,20 @@
 
 	@supports (corner-shape: squircle) {
 		:where(
-			.filters,
-			.card,
-			.card__section,
-			.filters__chip,
-			.card__category-chip,
-			.filters__clear,
-			.alert,
-			.alert__retry,
-			.locale-btn,
-			.results__count-badge,
-			.empty-state,
-			.noscript-notice,
-			.skip-link
-		) {
+				.filters,
+				.card,
+				.card__section,
+				.filters__chip,
+				.card__category-chip,
+				.filters__clear,
+				.alert,
+				.alert__retry,
+				.locale-btn,
+				.results__count-badge,
+				.empty-state,
+				.noscript-notice,
+				.skip-link
+			) {
 			corner-shape: squircle;
 		}
 	}

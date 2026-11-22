@@ -346,7 +346,8 @@ const buildRecipesQuery = (
 			let effortLevels = [];
 
 			const friendlyError = (err) => {
-				if (err.message?.includes("Failed to fetch")) return "ui:errors.network";
+				if (err.message?.includes("Failed to fetch"))
+					return "ui:errors.network";
 				return "ui:errors.unknown";
 			};
 
@@ -478,7 +479,10 @@ const buildRecipesQuery = (
 
 			const resetAndFetch = async () => {
 				await fetchItems(true);
-				resultsHeading.value?.scrollIntoView({ behavior: "smooth", block: "start" });
+				resultsHeading.value?.scrollIntoView({
+					behavior: "smooth",
+					block: "start",
+				});
 				resultsHeading.value?.focus({ preventScroll: true });
 			};
 
@@ -487,14 +491,11 @@ const buildRecipesQuery = (
 					categories.value.map((c) => [c.id, "ignore"]),
 				));
 
-			watch(
-				categoryStates,
-				() => {
-					if (loadingCategories.value) return;
-					if (debounceTimer) clearTimeout(debounceTimer);
-					debounceTimer = setTimeout(() => resetAndFetch(), 500);
-				}
-			);
+			watch(categoryStates, () => {
+				if (loadingCategories.value) return;
+				if (debounceTimer) clearTimeout(debounceTimer);
+				debounceTimer = setTimeout(() => resetAndFetch(), 500);
+			});
 
 			const setupIntersectionObserver = () => {
 				observer = new IntersectionObserver(
