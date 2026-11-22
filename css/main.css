@@ -716,6 +716,12 @@
 	}
 
 	.card {
+		--hue-spread: 15;
+		--hue-shift: 0;
+
+		--grad-a: hsl(from var(--primary) calc(h + var(--hue-shift)) s l);
+		--grad-b: hsl(from var(--accent)  calc(h + var(--hue-shift)) s l);
+
 		position: relative;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
@@ -725,7 +731,8 @@
 		min-inline-size: 0;
 		container-type: inline-size;
 		background-color: var(--surface);
-		background-image: linear-gradient(90deg, var(--primary), var(--accent) 55%, transparent);
+		background-image:
+			linear-gradient(90deg, var(--grad-a), var(--grad-b) 55%, transparent);
 		background-repeat: no-repeat;
 		background-position: top;
 		background-size: 100% 0.28em;
@@ -743,6 +750,13 @@
 			translate: 0 -2px;
 			border-color: var(--border-strong);
 			box-shadow: var(--shadow-md);
+		}
+	}
+
+	@supports (width: random(0px, 1px)) {
+		.card {
+			--hue-shift:
+				random(calc(-1 * var(--hue-spread)), var(--hue-spread));
 		}
 	}
 
