@@ -49,6 +49,9 @@
 			"proteins": "Proteínas",
 			"carbs": "Carboidratos",
 			"fats": "Gorduras Totais"
+		},
+		"units": {
+			"calories": "kcal"
 		}
 	},
 	"results": {
