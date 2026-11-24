@@ -1,4 +1,4 @@
-@layer reset, tokens, base, layout, components, utilities;
+@layer reset, tokens, base, layout, components, utilities, view-transitions;
 
 @layer reset {
 	*,
@@ -1073,10 +1073,6 @@
 }
 
 @layer utilities {
-	[v-cloak] {
-		display: none;
-	}
-
 	@supports (corner-shape: squircle) {
 		:where(
 				.filters,
@@ -1094,6 +1090,41 @@
 				.skip-link
 			) {
 			corner-shape: squircle;
+		}
+	}
+}
+
+@layer view-transitions {
+	::view-transition-old(root) {
+		animation: 220ms cubic-bezier(0.22, 1, 0.36, 1) both fade-out;
+	}
+
+	::view-transition-new(root) {
+		animation: 280ms cubic-bezier(0.22, 1, 0.36, 1) both fade-in;
+	}
+
+	@keyframes fade-out {
+		to {
+			opacity: 0;
+			translate: 0 -0.5rem;
+		}
+	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			translate: 0 0.5rem;
+		}
+	}
+
+	.app-brand__link {
+		view-transition-name: app-title;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		::view-transition-old(root),
+		::view-transition-new(root) {
+			animation: none;
 		}
 	}
 }

@@ -19,4 +19,9 @@ const router = createRouter({
 	},
 });
 
+router.beforeResolve(async (to, from) => {
+	if (!from.name || to.name === from.name) return;
+	await new Promise((resolve) => document.startViewTransition(resolve));
+});
+
 export default router;
