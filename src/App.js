@@ -1,12 +1,12 @@
 import { useLocale } from "./composables/useLocale.js";
 
 export default {
-    name: "App",
-    setup() {
-        const { currentLocale, setLocale, getSupportedLocales } = useLocale();
-        return { currentLocale, setLocale, getSupportedLocales };
-    },
-    template: `
+	name: "App",
+	setup() {
+		const { currentLocale, setLocale, getSupportedLocales } = useLocale();
+		return { currentLocale, setLocale, getSupportedLocales };
+	},
+	template: `
         <div class="app">
             <a class="skip-link" href="#main">{{ $t('ui:app.skip_link') }}</a>
             <header class="app-header">
@@ -33,5 +33,5 @@ export default {
                 <small>{{ $t('ui:app.legal') }}</small>
             </footer>
         </div>
-    `
+    `,
 };

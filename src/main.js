@@ -1,7 +1,6 @@
 import { createApp } from "vue";
-
-import { i18next, i18nextVue, initI18n } from "./i18n.js";
 import App from "./App.js";
+import { i18next, i18nextVue, initI18n } from "./i18n.js";
 import router from "./router.js";
 
 (async () => {
