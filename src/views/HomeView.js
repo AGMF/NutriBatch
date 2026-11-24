@@ -1,44 +1,40 @@
 export default {
-    name: "HomeView",
-    setup() {
-        const features = [
-            {
-                key: "goals",
-                icon: `
+	name: "HomeView",
+	setup() {
+		const features = [
+			{
+				key: "goals",
+				icon: `
                     <circle cx="12" cy="12" r="9"/>
                     <circle cx="12" cy="12" r="5"/>
                     <circle cx="12" cy="12" r="1.5"/>
                 `,
-            },
-            {
-                key: "balance",
-                icon: `
+			},
+			{
+				key: "balance",
+				icon: `
                     <path d="M12 3v18"/>
                     <path d="M5 8h14"/>
                     <path d="M5 8l-3 6a3 3 0 0 0 6 0z"/>
                     <path d="M19 8l-3 6a3 3 0 0 0 6 0z"/>
                 `,
-            },
-            {
-                key: "flexibility",
-                icon: `
+			},
+			{
+				key: "flexibility",
+				icon: `
                     <rect x="3" y="5" width="18" height="16" rx="2"/>
                     <path d="M3 10h18"/>
                     <path d="M8 3v4"/>
                     <path d="M16 3v4"/>
                 `,
-            },
-        ];
+			},
+		];
 
-        const steps = [
-            { key: "define" },
-            { key: "select" },
-            { key: "plan" },
-        ];
+		const steps = [{ key: "define" }, { key: "select" }, { key: "plan" }];
 
-        return { features, steps };
-    },
-    template: `
+		return { features, steps };
+	},
+	template: `
         <div class="home">
             <section class="hero" aria-labelledby="hero-title">
                 <p class="hero__eyebrow">{{ $t('ui:home.eyebrow') }}</p>
@@ -81,5 +77,5 @@ export default {
                 </ol>
             </section>
         </div>
-    `
+    `,
 };

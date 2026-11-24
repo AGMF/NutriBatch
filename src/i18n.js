@@ -1,10 +1,10 @@
-import { computed, ref } from "vue";
 import ChainedBackend from "i18nextChainedBackend";
 import HttpBackend from "i18nextHttpBackend";
 import LanguageDetector from "i18nextLanguageDetector";
 import LocalStorageBackend from "i18nextLocalstorageBackend";
 import i18nextVue, { useTranslation } from "i18nextVue";
 import i18next from "i18next";
+import { computed, ref } from "vue";
 
 const getLocalePath = (subpath) => `./src/locales/${subpath}.json`;
 

@@ -5,9 +5,9 @@ export default {
 	name: "App",
 	setup() {
 		const { currentLocale, setLocale, getSupportedLocales } = useLocale();
-        const mainContent = useTemplateRef("mainContent");
+		const mainContent = useTemplateRef("mainContent");
 
-        const skipToMain = () => mainContent.value?.focus();
+		const skipToMain = () => mainContent.value?.focus();
 
 		return { currentLocale, setLocale, getSupportedLocales, skipToMain };
 	},
