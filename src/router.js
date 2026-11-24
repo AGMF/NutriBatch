@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vueRouter";
 import HomeView from "./views/HomeView.js";
+import PlannerSetupView from "./views/PlannerSetupView.js";
 import RecipeSelectionView from "./views/RecipeSelectionView.js";
 
 const routes = [
@@ -10,7 +11,8 @@ const routes = [
 	},
 	{
 		path: "/planner",
-		redirect: "/recipes",
+		name: "planner",
+		component: PlannerSetupView,
 	},
 	{
 		path: "/recipes",

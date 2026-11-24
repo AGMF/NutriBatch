@@ -42,6 +42,51 @@
 			}
 		}
 	},
+	"planner": {
+		"title": "Set up your plan",
+		"subtitle": "Define your calorie goal, the days of the week, and the meals you plan to have.",
+		"kcal": {
+			"label": "Daily calorie goal",
+			"unit": "kcal",
+			"hint": "Approximate number of calories per day."
+		},
+		"days": {
+			"label": "Days of the week",
+			"hint": "Select at least one day to follow the plan.",
+			"short": {
+				"mon": "Mon",
+				"tue": "Tue",
+				"wed": "Wed",
+				"thu": "Thu",
+				"fri": "Fri",
+				"sat": "Sat",
+				"sun": "Sun"
+			}
+		},
+		"meals": {
+			"label": "Meals per day",
+			"hint": "Define the meals and how much of the daily total each should represent.",
+			"add": "Add meal",
+			"remove": "Remove meal",
+			"type_label": "Meal type",
+			"ratio_label": "Meal ratio",
+			"total": "Total: {{ value }}%",
+			"warn": "Ratios must add up to 100%.",
+			"normalize": "Auto-adjust"
+		},
+		"meal_types": {
+			"breakfast": "Breakfast",
+			"lunch": "Lunch",
+			"dinner": "Dinner",
+			"snack": "Snack",
+			"supper": "Supper"
+		},
+		"actions": {
+			"reset": "Reset",
+			"continue": "Continue to recipes",
+			"cancel": "Back"
+		}
+	},
 	"filters": {
 		"title": "Filters",
 		"clear": "Clear filters",

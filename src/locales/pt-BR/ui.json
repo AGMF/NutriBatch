@@ -42,6 +42,51 @@
 			}
 		}
 	},
+	"planner": {
+		"title": "Configure seu plano",
+		"subtitle": "Defina sua meta calórica, os dias da semana e as refeições que pretende fazer.",
+		"kcal": {
+			"label": "Meta calórica diária",
+			"unit": "kcal",
+			"hint": "Valor aproximado de calorias por dia."
+		},
+		"days": {
+			"label": "Dias da semana",
+			"hint": "Selecione pelo menos um dia em que pretende seguir o plano.",
+			"short": {
+				"mon": "Seg",
+				"tue": "Ter",
+				"wed": "Qua",
+				"thu": "Qui",
+				"fri": "Sex",
+				"sat": "Sáb",
+				"sun": "Dom"
+			}
+		},
+		"meals": {
+			"label": "Refeições por dia",
+			"hint": "Defina as refeições e a proporção do total diário que cada uma deve representar.",
+			"add": "Adicionar refeição",
+			"remove": "Remover refeição",
+			"type_label": "Tipo da refeição",
+			"ratio_label": "Proporção da refeição",
+			"total": "Total: {{ value }}%",
+			"warn": "A soma das proporções deve ser 100%.",
+			"normalize": "Ajustar automaticamente"
+		},
+		"meal_types": {
+			"breakfast": "Café da manhã",
+			"lunch": "Almoço",
+			"dinner": "Jantar",
+			"snack": "Lanche",
+			"supper": "Ceia"
+		},
+		"actions": {
+			"reset": "Redefinir",
+			"continue": "Continuar para receitas",
+			"cancel": "Voltar"
+		}
+	},
 	"filters": {
 		"title": "Filtros",
 		"clear": "Limpar filtros",
