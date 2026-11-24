@@ -1923,15 +1923,15 @@
 @layer utilities {
 	@supports (corner-shape: squircle) {
 		:where(
-			.planner__section,
-			.day-toggle,
-			.meal-row,
-			.meal-select,
-			.meal-ratio,
-			.meal-add,
-			.meal-summary__normalize,
-			.planner__input-group
-		) {
+				.planner__section,
+				.day-toggle,
+				.meal-row,
+				.meal-select,
+				.meal-ratio,
+				.meal-add,
+				.meal-summary__normalize,
+				.planner__input-group
+			) {
 			corner-shape: squircle;
 		}
 	}

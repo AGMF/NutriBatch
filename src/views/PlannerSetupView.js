@@ -1,121 +1,121 @@
-import { computed } from "vue";
 import { useRouter } from "vueRouter";
+import { computed } from "vue";
 import {
-    MEAL_TYPES,
-    planner,
-    addMeal,
-    removeMeal,
-    toggleDay,
-    resetPlanner,
+	addMeal,
+	MEAL_TYPES,
+	planner,
+	removeMeal,
+	resetPlanner,
+	toggleDay,
 } from "../stores/planner.js";
 
 export default {
-    name: "PlannerSetupView",
-    setup() {
-        const router = useRouter();
+	name: "PlannerSetupView",
+	setup() {
+		const router = useRouter();
 
-        const DAYS = [
-            { value: 1, key: "mon" },
-            { value: 2, key: "tue" },
-            { value: 3, key: "wed" },
-            { value: 4, key: "thu" },
-            { value: 5, key: "fri" },
-            { value: 6, key: "sat" },
-            { value: 0, key: "sun" },
-        ];
+		const DAYS = [
+			{ value: 1, key: "mon" },
+			{ value: 2, key: "tue" },
+			{ value: 3, key: "wed" },
+			{ value: 4, key: "thu" },
+			{ value: 5, key: "fri" },
+			{ value: 6, key: "sat" },
+			{ value: 0, key: "sun" },
+		];
 
-        const dailyKcal = computed({
-            get: () => planner.dailyKcal,
-            set: (v) => {
-                const n = Number(v);
-                planner.dailyKcal = Number.isFinite(n) && n >= 0 ? n : 0;
-            },
-        });
+		const dailyKcal = computed({
+			get: () => planner.dailyKcal,
+			set: (v) => {
+				const n = Number(v);
+				planner.dailyKcal = Number.isFinite(n) && n >= 0 ? n : 0;
+			},
+		});
 
-        const stepKcal = (delta) => {
-            const current = Number(planner.dailyKcal) || 1000;
-            const next = Math.min(10000, Math.max(1000, current + delta));
-            planner.dailyKcal = next;
-        };
+		const stepKcal = (delta) => {
+			const current = Number(planner.dailyKcal) || 1000;
+			const next = Math.min(10000, Math.max(1000, current + delta));
+			planner.dailyKcal = next;
+		};
 
-        const stepRatio = (meal, delta) => {
-            const current = Number(meal.ratio) || 0;
-            meal.ratio = Math.min(100, Math.max(0, current + delta));
-        };
+		const stepRatio = (meal, delta) => {
+			const current = Number(meal.ratio) || 0;
+			meal.ratio = Math.min(100, Math.max(0, current + delta));
+		};
 
-        const totalRatio = computed(() =>
-            planner.meals.reduce((sum, m) => sum + (Number(m.ratio) || 0), 0),
-        );
+		const totalRatio = computed(() =>
+			planner.meals.reduce((sum, m) => sum + (Number(m.ratio) || 0), 0),
+		);
 
-        const ratioOk = computed(() => Math.abs(totalRatio.value - 100) < 0.5);
+		const ratioOk = computed(() => Math.abs(totalRatio.value - 100) < 0.5);
 
-        const canContinue = computed(
-            () =>
-                planner.dailyKcal > 0 &&
-                planner.selectedDays.length > 0 &&
-                planner.meals.length > 0 &&
-                ratioOk.value,
-        );
+		const canContinue = computed(
+			() =>
+				planner.dailyKcal > 0 &&
+				planner.selectedDays.length > 0 &&
+				planner.meals.length > 0 &&
+				ratioOk.value,
+		);
 
-        const normalizeRatios = () => {
-            const total = planner.meals.reduce(
-                (sum, m) => sum + Math.max(0, Number(m.ratio) || 0),
-                0,
-            );
+		const normalizeRatios = () => {
+			const total = planner.meals.reduce(
+				(sum, m) => sum + Math.max(0, Number(m.ratio) || 0),
+				0,
+			);
 
-            if (total <= 0) return;
-            const TARGET_UNITS = 20;
-            const entries = planner.meals.map((m, index) => {
-                const raw = Math.max(0, Number(m.ratio) || 0);
-                const exactUnits = (raw / total) * TARGET_UNITS;
-                const floorUnits = Math.floor(exactUnits);
-                return {
-                    index,
-                    raw,
-                    units: floorUnits,
-                    remainder: exactUnits - floorUnits,
-                };
-            });
+			if (total <= 0) return;
+			const TARGET_UNITS = 20;
+			const entries = planner.meals.map((m, index) => {
+				const raw = Math.max(0, Number(m.ratio) || 0);
+				const exactUnits = (raw / total) * TARGET_UNITS;
+				const floorUnits = Math.floor(exactUnits);
+				return {
+					index,
+					raw,
+					units: floorUnits,
+					remainder: exactUnits - floorUnits,
+				};
+			});
 
-            const remainingUnits = TARGET_UNITS - entries.reduce((sum, e) => sum + e.units, 0);
+			const remainingUnits =
+				TARGET_UNITS - entries.reduce((sum, e) => sum + e.units, 0);
 
-            const byRemainder = [...entries].sort(
-                (a, b) => b.remainder - a.remainder || b.raw - a.raw,
-            );
+			const byRemainder = [...entries].sort(
+				(a, b) => b.remainder - a.remainder || b.raw - a.raw,
+			);
 
-            for (let i = 0; i < remainingUnits; i++)
-                byRemainder[i].units += 1;
+			for (let i = 0; i < remainingUnits; i++) byRemainder[i].units += 1;
 
-            planner.meals = planner.meals.map((m, index) => ({
-                ...m,
-                ratio: entries[index].units * 5,
-            }));
-        };
+			planner.meals = planner.meals.map((m, index) => ({
+				...m,
+				ratio: entries[index].units * 5,
+			}));
+		};
 
-        const continueToRecipes = () => {
-            if (!canContinue.value) return;
-            router.push({ name: "recipes" });
-        };
+		const continueToRecipes = () => {
+			if (!canContinue.value) return;
+			router.push({ name: "recipes" });
+		};
 
-        return {
-            planner,
-            MEAL_TYPES,
-            DAYS,
-            addMeal,
-            removeMeal,
-            toggleDay,
-            resetPlanner,
-            dailyKcal,
-            stepKcal,
-            stepRatio,
-            totalRatio,
-            ratioOk,
-            canContinue,
-            normalizeRatios,
-            continueToRecipes,
-        };
-    },
-    template: `
+		return {
+			planner,
+			MEAL_TYPES,
+			DAYS,
+			addMeal,
+			removeMeal,
+			toggleDay,
+			resetPlanner,
+			dailyKcal,
+			stepKcal,
+			stepRatio,
+			totalRatio,
+			ratioOk,
+			canContinue,
+			normalizeRatios,
+			continueToRecipes,
+		};
+	},
+	template: `
         <div class="planner-page">
             <section class="planner-intro">
                 <h2 class="section-title">{{ $t('ui:planner.title') }}</h2>
