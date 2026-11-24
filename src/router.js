@@ -1,8 +1,17 @@
 import { createRouter, createWebHashHistory } from "vueRouter";
+import HomeView from "./views/HomeView.js";
 import RecipeSelectionView from "./views/RecipeSelectionView.js";
 
 const routes = [
-	{ path: "/", redirect: "/recipes" },
+	{
+		path: "/",
+		name: "home",
+		component: HomeView,
+	},
+	{
+		path: "/planner",
+		redirect: "/recipes",
+	},
 	{
 		path: "/recipes",
 		name: "recipes",

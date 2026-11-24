@@ -1,3 +1,4 @@
+import { computed, ref } from "vue";
 import ChainedBackend from "i18nextChainedBackend";
 import HttpBackend from "i18nextHttpBackend";
 import LanguageDetector from "i18nextLanguageDetector";
@@ -42,6 +43,20 @@ const updateDomAttributes = (lng) => {
 	if (meta) meta.setAttribute("content", i18next.t("ui:app.description"));
 };
 
+const i18nVersion = ref(0);
+
+const bumpI18n = () => i18nVersion.value++;
+
+export const currentLocale = computed(() => {
+	void i18nVersion.value;
+	return i18next.resolvedLanguage;
+});
+
+export const t = (key, options) => {
+	void i18nVersion.value;
+	return i18next.t(key, options);
+};
+
 export const initI18n = async () => {
 	const response = await fetch(getLocalePath("manifest"));
 	const manifest = await response.json();
@@ -52,7 +67,10 @@ export const initI18n = async () => {
 		.init(createI18nConfig(manifest));
 
 	updateDomAttributes(i18next.resolvedLanguage);
-	i18next.on("languageChanged", updateDomAttributes);
+	i18next.on("languageChanged", (lng) => {
+		updateDomAttributes(lng);
+		bumpI18n();
+	});
 
 	return i18next;
 };

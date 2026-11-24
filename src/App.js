@@ -1,14 +1,19 @@
+import { useTemplateRef } from "vue";
 import { useLocale } from "./composables/useLocale.js";
 
 export default {
 	name: "App",
 	setup() {
 		const { currentLocale, setLocale, getSupportedLocales } = useLocale();
-		return { currentLocale, setLocale, getSupportedLocales };
+        const mainContent = useTemplateRef("mainContent");
+
+        const skipToMain = () => mainContent.value?.focus();
+
+		return { currentLocale, setLocale, getSupportedLocales, skipToMain };
 	},
 	template: `
         <div class="app">
-            <a class="skip-link" href="#main">{{ $t('ui:app.skip_link') }}</a>
+            <a class="skip-link" href="#main" @click.prevent="skipToMain">{{ $t('ui:app.skip_link') }}</a>
             <header class="app-header">
                 <h1 class="app-brand">
                     <router-link to="/" class="app-brand__link">NutriBatch</router-link>
@@ -25,7 +30,7 @@ export default {
                 </nav>
             </header>
 
-            <main id="main" class="app-main" tabindex="-1">
+            <main id="main" ref="mainContent" class="app-main" tabindex="-1">
                 <router-view></router-view>
             </main>
 

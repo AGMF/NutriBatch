@@ -5,6 +5,43 @@
 		"skip_link": "Pular para o conteúdo",
 		"language_switcher": "Idioma"
 	},
+	"home": {
+		"eyebrow": "Planejamento nutricional",
+		"title": "Seu plano alimentar, sob medida",
+		"subtitle": "Defina sua meta calórica, escolha suas receitas e receba um plano equilibrado para cada dia da semana.",
+		"cta": "Começar planejamento",
+		"secondary_cta": "Ver receitas",
+		"features_title": "Como o NutriBatch ajuda",
+		"features": {
+			"goals": {
+				"title": "Metas personalizadas",
+				"body": "Defina sua meta calórica diária e a quantidade de refeições que quer fazer em cada dia."
+			},
+			"balance": {
+				"title": "Equilíbrio nutricional",
+				"body": "O app distribui as receitas ao longo do dia para manter as refeições equilibradas."
+			},
+			"flexibility": {
+				"title": "Flexibilidade total",
+				"body": "Escolha em quais dias da semana seguir o plano e ajuste as porções a qualquer momento."
+			}
+		},
+		"how_title": "Como funciona",
+		"steps": {
+			"define": {
+				"title": "Defina suas metas",
+				"body": "Informe sua meta calórica diária, escolha os dias e as refeições que pretende fazer."
+			},
+			"select": {
+				"title": "Escolha suas receitas",
+				"body": "Navegue pelas receitas, filtre por categoria e selecione as que quer incluir no plano."
+			},
+			"plan": {
+				"title": "Receba seu plano",
+				"body": "O app monta um plano equilibrado, com porções ajustadas para atingir sua meta."
+			}
+		}
+	},
 	"filters": {
 		"title": "Filtros",
 		"clear": "Limpar filtros",

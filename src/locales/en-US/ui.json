@@ -5,6 +5,43 @@
 		"skip_link": "Skip to content",
 		"language_switcher": "Language"
 	},
+	"home": {
+		"eyebrow": "Nutrition planning",
+		"title": "A meal plan made to fit you",
+		"subtitle": "Set your calorie goal, pick your recipes, and get a balanced plan for every day of the week.",
+		"cta": "Start planning",
+		"secondary_cta": "Browse recipes",
+		"features_title": "How NutriBatch helps",
+		"features": {
+			"goals": {
+				"title": "Personalized goals",
+				"body": "Set your daily calorie goal and how many meals you want to have each day."
+			},
+			"balance": {
+				"title": "Nutritional balance",
+				"body": "The app spreads recipes across the day to keep every meal balanced."
+			},
+			"flexibility": {
+				"title": "Full flexibility",
+				"body": "Choose which days of the week to follow the plan and adjust portions anytime."
+			}
+		},
+		"how_title": "How it works",
+		"steps": {
+			"define": {
+				"title": "Set your goals",
+				"body": "Enter your daily calorie goal, choose the days, and the meals you plan to have."
+			},
+			"select": {
+				"title": "Pick your recipes",
+				"body": "Browse recipes, filter by category, and select the ones to include in the plan."
+			},
+			"plan": {
+				"title": "Get your plan",
+				"body": "The app builds a balanced plan with portions tailored to hit your goal."
+			}
+		}
+	},
 	"filters": {
 		"title": "Filters",
 		"clear": "Clear filters",
