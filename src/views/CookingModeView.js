@@ -23,7 +23,7 @@ const SCOPE_LOTE = "lote";
 
 const getScopedRecipes = (recipes, scope) => {
     if (!scope || scope === SCOPE_LOTE) return recipes;
-    const match = /^dia-(\d)$/.exec(scope);
+    const match = /^day-(\d)$/.exec(scope);
     if (!match) return recipes;
 
     const dayIndex = Number(match[1]);

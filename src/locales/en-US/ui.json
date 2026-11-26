@@ -106,6 +106,9 @@
 		"restart": "Adjust goals",
 		"macros": "Portion macronutrients",
 		"summary_region": "Plan summary",
+		"start_cooking": "Start cooking",
+		"open_shopping": "Shopping list",
+		"cook_this_day": "Cook this day",
 		"summary": {
 			"days": "Days",
 			"avg_kcal": "Daily average"

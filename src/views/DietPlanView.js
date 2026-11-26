@@ -20,7 +20,6 @@ export default {
         const recipes = ref([]);
 
         const plan = computed(() => generateDietPlan(recipes.value, planner));
-
         const totalMacros = computed(() => summarizePlanMacros(plan.value));
 
         const averageKcal = computed(() => {
@@ -107,6 +106,16 @@ export default {
             <header class="diet-page__header">
                 <h2 class="section-title">{{ $t('ui:diet.title') }}</h2>
                 <div class="diet-page__actions">
+                    <router-link
+                        :to="{ name: 'cooking', params: { scope: 'lote' } }"
+                        class="btn btn--primary">
+                        {{ $t('ui:diet.start_cooking') }}
+                    </router-link>
+                    <router-link
+                        :to="{ name: 'shopping', query: { scope: 'lote' } }"
+                        class="btn btn--ghost">
+                        {{ $t('ui:diet.open_shopping') }}
+                    </router-link>
                     <button type="button" class="btn btn--ghost" @click="backToRecipes">
                         {{ $t('ui:diet.back') }}
                     </button>
@@ -166,6 +175,11 @@ export default {
                                 <strong>{{ formatKcal(day.totalKcal) }}</strong>
                                 / {{ formatKcal(day.targetKcal) }} kcal
                             </p>
+                            <router-link
+                                :to="{ name: 'cooking', params: { scope: 'day-' + day.day } }"
+                                class="diet-day__cook-link">
+                                {{ $t('ui:diet.cook_this_day') }}
+                            </router-link>
                         </header>
 
                         <ol class="diet-meals">

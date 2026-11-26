@@ -38,7 +38,7 @@ const computePortions = (plan) => {
 
 const filterPlanByScope = (plan, scope) => {
     if (!scope || scope === "lote") return plan;
-    const match = /^dia-(\d)$/.exec(scope);
+    const match = /^day-(\d)$/.exec(scope);
     if (!match) return plan;
     const dayIndex = Number(match[1]);
     const filtered = plan.filter((d) => d.day === dayIndex);
@@ -70,7 +70,7 @@ export default {
         const scopeKind = computed(() => {
             const scope = route.query.scope;
             if (!scope || scope === "lote") return "lote";
-            const match = /^dia-(\d)$/.exec(scope);
+            const match = /^day-(\d)$/.exec(scope);
             if (match) return "day";
             return "lote";
         });
@@ -78,7 +78,7 @@ export default {
         const scopeDay = computed(() => {
             const scope = route.query.scope;
             if (!scope) return null;
-            const match = /^dia-(\d)$/.exec(scope);
+            const match = /^day-(\d)$/.exec(scope);
             if (!match) return null;
             return DAY_NAMES[Number(match[1])] ?? null;
         });

@@ -106,6 +106,9 @@
 		"restart": "Ajustar metas",
 		"macros": "Macronutrientes da porção",
 		"summary_region": "Resumo do plano",
+		"start_cooking": "Iniciar preparo",
+		"open_shopping": "Lista de compras",
+		"cook_this_day": "Preparar este dia",
 		"summary": {
 			"days": "Dias",
 			"avg_kcal": "Média diária"

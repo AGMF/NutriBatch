@@ -2211,6 +2211,35 @@
 		color: var(--text);
 	}
 
+	.diet-day__cook-link {
+		margin-inline-start: auto;
+		padding: 0.35em 0.9em;
+		font-size: var(--step--1);
+		font-weight: 700;
+		color: var(--primary-ink);
+		background: color-mix(in oklch, var(--primary) 12%, var(--surface));
+		border: 1.5px solid color-mix(in oklch, var(--primary) 40%, var(--border));
+		border-radius: var(--radius-full);
+		text-decoration: none;
+		transition:
+			background-color var(--dur) var(--ease),
+			border-color var(--dur) var(--ease);
+	}
+
+	@media (any-hover: hover) and (any-pointer: fine) {
+		.diet-day__cook-link:hover {
+			background: color-mix(in oklch, var(--primary) 22%, var(--surface));
+			border-color: var(--primary);
+		}
+	}
+
+	@media (pointer: coarse) {
+		.diet-day__cook-link {
+			min-block-size: 2.5rem;
+			padding-block: 0.55rem;
+		}
+	}
+
 	.diet-meals {
 		display: grid;
 		gap: 0.65rem;
@@ -2786,5 +2815,274 @@
 		:where(.shopping-item, .shopping-page__summary) {
 			corner-shape: squircle;
 		}
+	}
+}
+
+@page {
+	margin: 1.5cm;
+}
+
+@media print {
+	.app-header,
+	.app-footer,
+	.skip-link,
+	.no-print,
+	.selection-bar,
+	.filters,
+	.alert,
+	.empty-state,
+	.results__sentinel,
+	.results__count,
+	.status,
+	.cooking,
+	.diet-page__actions,
+	.diet-day__cook-link,
+	.shopping-page__header,
+	.shopping-page__summary,
+	button,
+	.btn {
+		display: none !important;
+	}
+
+	html,
+	body {
+		background: #fff !important;
+		color: #000 !important;
+		font-size: 12pt !important;
+		line-height: 1.4 !important;
+	}
+
+	body {
+		padding: 0 !important;
+	}
+
+	.app,
+	.app-main,
+	.results,
+	.shopping-page,
+	.diet-page,
+	.diet-days {
+		display: block !important;
+		max-inline-size: none !important;
+		min-block-size: 0 !important;
+		padding: 0 !important;
+		margin: 0 !important;
+		gap: 0 !important;
+		grid-template-columns: none !important;
+		box-shadow: none !important;
+	}
+
+	.section-title {
+		font-size: 18pt !important;
+		margin-block-end: 0.6cm !important;
+		padding: 0 !important;
+	}
+
+	.section-title::before {
+		display: none !important;
+	}
+
+	strong {
+		font-weight: 700 !important;
+	}
+
+	.shopping-list {
+		gap: 0.15rem !important;
+	}
+
+	.shopping-item {
+		display: flex !important;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.3cm 1cm;
+		padding: 0.25cm 0 !important;
+		background: none !important;
+		border: 0 !important;
+		border-block-end: 1px solid #bbb !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		break-inside: avoid;
+		page-break-inside: avoid;
+	}
+
+	.shopping-item--owned {
+		opacity: 1 !important;
+	}
+
+	.shopping-item--owned .shopping-item__name,
+	.shopping-item--owned .shopping-item__needed,
+	.shopping-item--owned .shopping-item__purchase {
+		text-decoration: line-through;
+		color: #666 !important;
+	}
+
+	shopping-item__check {
+		appearance: none;
+		-webkit-appearance: none;
+		inline-size: 1em !important;
+		block-size: 1em !important;
+		border: 1.5px solid #000 !important;
+		border-radius: 2px !important;
+		display: inline-grid !important;
+		place-items: center;
+		margin-inline-end: 0.5em;
+		vertical-align: middle;
+		accent-color: #000 !important;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	.shopping-item__check:checked::after {
+		content: "✓";
+		font-size: 0.9em;
+		font-weight: 700;
+		line-height: 1;
+		color: #000;
+	}
+
+	.shopping-item__name {
+		font-weight: 600 !important;
+	}
+
+	.shopping-item__quantities {
+		display: inline-flex !important;
+		gap: 0.6cm;
+		min-inline-size: 0 !important;
+		text-align: end !important;
+		padding: 0 !important;
+	}
+
+	.shopping-item__needed,
+	.shopping-item__purchase {
+		font-size: 11pt !important;
+		color: #000 !important;
+	}
+
+	.shopping-item__needed::after {
+		content: "";
+	}
+
+	.diet-summary {
+		display: grid !important;
+		grid-template-columns: repeat(5, 1fr) !important;
+		gap: 0.3cm !important;
+		margin-block-end: 0.6cm !important;
+	}
+
+	.diet-summary__item {
+		background: none !important;
+		border: 1px solid #bbb !important;
+		border-radius: 3px !important;
+		box-shadow: none !important;
+		padding: 0.25cm !important;
+	}
+
+	.diet-summary__label {
+		color: #333 !important;
+		font-size: 8pt !important;
+	}
+
+	.diet-summary__value {
+		font-size: 12pt !important;
+	}
+
+	.diet-days {
+		display: grid !important;
+		grid-template-columns: 1fr !important;
+		gap: 0.5cm !important;
+	}
+
+	.diet-day {
+		background: none !important;
+		border: 1px solid #bbb !important;
+		border-block-start: 3px solid #000 !important;
+		border-radius: 3px !important;
+		box-shadow: none !important;
+		padding: 0.3cm 0.4cm !important;
+		break-inside: avoid;
+		page-break-inside: avoid;
+	}
+
+	.diet-day__header {
+		margin-block-end: 0.2cm;
+		padding-block-end: 0.15cm;
+		border-block-end: 1px dashed #bbb;
+	}
+
+	.diet-day__title {
+		font-size: 12pt !important;
+	}
+
+	.diet-day__kcal {
+		color: #333 !important;
+		font-size: 10pt !important;
+	}
+
+	.diet-meals {
+		gap: 0.15cm !important;
+	}
+
+	.diet-meal {
+		background: none !important;
+		border: 0 !important;
+		padding: 0.15cm 0 !important;
+		break-inside: avoid;
+		page-break-inside: avoid;
+	}
+
+	.diet-meal__header {
+		margin-block-end: 0.1cm;
+		padding-block-end: 0.05cm;
+		border-block-end: 0 !important;
+	}
+
+	.diet-meal__title {
+		font-size: 11pt !important;
+		color: #333 !important;
+	}
+
+	.diet-meal__kcal {
+		font-size: 10pt !important;
+		color: #333 !important;
+	}
+
+	.diet-recipe {
+		display: grid !important;
+		grid-template-columns: 1fr auto !important;
+		gap: 0.3cm !important;
+		padding-block: 0.15cm !important;
+	}
+
+	.diet-recipe__name {
+		font-size: 11pt !important;
+	}
+
+	.diet-recipe__meta {
+		font-size: 10pt !important;
+		color: #333 !important;
+	}
+
+	.diet-recipe__grams::before {
+		background: #000 !important;
+	}
+
+	.diet-recipe__macros {
+		gap: 0.2cm !important;
+	}
+
+	.diet-recipe__macros li {
+		background: none !important;
+		border: 1px solid #bbb !important;
+		padding: 0.1cm 0.2cm !important;
+	}
+
+	.diet-recipe__macros li > span {
+		font-size: 7pt !important;
+		color: #333 !important;
+	}
+
+	.diet-recipe__macros li > strong {
+		font-size: 9pt !important;
 	}
 }
