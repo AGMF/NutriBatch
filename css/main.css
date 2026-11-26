@@ -983,6 +983,10 @@
 		border-end-end-radius: calc(var(--radius) - 1px);
 	}
 
+	.card__summary:focus {
+		outline: none;
+	}
+
 	.card__section[open] > .card__summary {
 		border-end-start-radius: 0;
 		border-end-end-radius: 0;
@@ -1013,10 +1017,6 @@
 		.card__summary:hover {
 			background: color-mix(in oklch, var(--primary) 8%, transparent);
 		}
-	}
-
-	.card__summary:focus {
-		outline: none;
 	}
 
 	.card__section:has(> .card__summary:focus-visible) {
@@ -2432,7 +2432,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
-		gap: 1rem;
+		font-size: var(--step-0);
 	}
 
 	.cooking__exit {
@@ -2715,6 +2715,24 @@
 		border-color: color-mix(in oklch, var(--border) 70%, transparent);
 	}
 
+	.shopping-item__name {
+		font-weight: 600;
+		overflow-wrap: break-word;
+	}
+
+	.shopping-item__needed {
+		font-size: var(--step--1);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--text);
+	}
+
+	.shopping-item__purchase {
+		font-size: var(--step--1);
+		font-variant-numeric: tabular-nums;
+		color: var(--text-muted);
+	}
+
 	.shopping-item--owned .shopping-item__name,
 	.shopping-item--owned .shopping-item__needed,
 	.shopping-item--owned .shopping-item__purchase {
@@ -2740,30 +2758,12 @@
 		cursor: pointer;
 	}
 
-	.shopping-item__name {
-		font-weight: 600;
-		overflow-wrap: break-word;
-	}
-
 	.shopping-item__quantities {
 		display: grid;
 		gap: 0.1rem;
 		text-align: end;
 		flex: 0 0 auto;
 		min-inline-size: 6.5rem;
-	}
-
-	.shopping-item__needed {
-		font-size: var(--step--1);
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-		color: var(--text);
-	}
-
-	.shopping-item__purchase {
-		font-size: var(--step--1);
-		font-variant-numeric: tabular-nums;
-		color: var(--text-muted);
 	}
 
 	.shopping-item__badge {
@@ -2801,7 +2801,7 @@
 	@media (pointer: coarse) {
 		.shopping-item__check {
 			inline-size: 1.6rem;
-			inline-size: 1.6rem;
+			block-size: 1.6rem;
 		}
 
 		.shopping-item {
@@ -2910,6 +2910,16 @@
 		opacity: 1 !important;
 	}
 
+	.shopping-item__name {
+		font-weight: 600 !important;
+	}
+
+	.shopping-item__needed,
+	.shopping-item__purchase {
+		font-size: 11pt !important;
+		color: #000 !important;
+	}
+
 	.shopping-item--owned .shopping-item__name,
 	.shopping-item--owned .shopping-item__needed,
 	.shopping-item--owned .shopping-item__purchase {
@@ -2941,22 +2951,12 @@
 		color: #000;
 	}
 
-	.shopping-item__name {
-		font-weight: 600 !important;
-	}
-
 	.shopping-item__quantities {
 		display: inline-flex !important;
 		gap: 0.6cm;
 		min-inline-size: 0 !important;
 		text-align: end !important;
 		padding: 0 !important;
-	}
-
-	.shopping-item__needed,
-	.shopping-item__purchase {
-		font-size: 11pt !important;
-		color: #000 !important;
 	}
 
 	.shopping-item__needed::after {
