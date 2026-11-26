@@ -1,184 +1,190 @@
-import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vueRouter";
-import { supabase } from "../lib/supabase.js";
+import { computed, onMounted, ref } from "vue";
 import { useLocale } from "../composables/useLocale.js";
+import { supabase } from "../lib/supabase.js";
 import { planner } from "../stores/planner.js";
-import { buildShoppingList } from "../utils/shoppingList.js";
 import { generateDietPlan } from "../utils/mealPlanner.js";
 import { BASE_SELECT_FIELDS, transformRecipe } from "../utils/recipes.js";
+import { buildShoppingList } from "../utils/shoppingList.js";
 
 const OWNED_KEY = "nutribatch:shopping-owned";
 const DAY_NAMES = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 const loadOwned = () => {
-    try {
-        const raw = localStorage.getItem(OWNED_KEY);
-        if (!raw) return new Set();
-        const arr = JSON.parse(raw);
-        return new Set(Array.isArray(arr) ? arr.filter((x) => typeof x === "string") : []);
-    } catch {
-        return new Set();
-    }
+	try {
+		const raw = localStorage.getItem(OWNED_KEY);
+		if (!raw) return new Set();
+		const arr = JSON.parse(raw);
+		return new Set(
+			Array.isArray(arr) ? arr.filter((x) => typeof x === "string") : [],
+		);
+	} catch {
+		return new Set();
+	}
 };
 
 const saveOwned = (set) => {
-    try {
-        localStorage.setItem(OWNED_KEY, JSON.stringify([...set]));
-    } catch (_err) {}
+	try {
+		localStorage.setItem(OWNED_KEY, JSON.stringify([...set]));
+	} catch (_err) {}
 };
 
 const computePortions = (plan) => {
-    const totals = new Map();
-    for (const day of plan)
-        for (const meal of day.meals)
-            for (const recipe of meal.recipes)
-                totals.set(recipe.id, (totals.get(recipe.id) ?? 0) + recipe.grams);
-    return Object.fromEntries(totals);
+	const totals = new Map();
+	for (const day of plan)
+		for (const meal of day.meals)
+			for (const recipe of meal.recipes)
+				totals.set(recipe.id, (totals.get(recipe.id) ?? 0) + recipe.grams);
+	return Object.fromEntries(totals);
 };
 
 const filterPlanByScope = (plan, scope) => {
-    if (!scope || scope === "lote") return plan;
-    const match = /^day-(\d)$/.exec(scope);
-    if (!match) return plan;
-    const dayIndex = Number(match[1]);
-    const filtered = plan.filter((d) => d.day === dayIndex);
-    return filtered.length ? filtered : plan;
+	if (!scope || scope === "lote") return plan;
+	const match = /^day-(\d)$/.exec(scope);
+	if (!match) return plan;
+	const dayIndex = Number(match[1]);
+	const filtered = plan.filter((d) => d.day === dayIndex);
+	return filtered.length ? filtered : plan;
 };
 
 export default {
-    name: "ShoppingListView",
-    setup() {
-        const route = useRoute();
-        const { currentLocale } = useLocale();
+	name: "ShoppingListView",
+	setup() {
+		const route = useRoute();
+		const { currentLocale } = useLocale();
 
-        const items = ref([]);
-        const owned = ref(loadOwned());
-        const loading = ref(true);
-        const error = ref(null);
+		const items = ref([]);
+		const owned = ref(loadOwned());
+		const loading = ref(true);
+		const error = ref(null);
 
-        const visibleItems = computed(() =>
-            items.value.map((item) => ({
-                ...item,
-                owned: owned.value.has(item.codeKey),
-            }))
-        );
+		const visibleItems = computed(() =>
+			items.value.map((item) => ({
+				...item,
+				owned: owned.value.has(item.codeKey),
+			})),
+		);
 
-        const pendingCount = computed(() => visibleItems.value.filter((i) => !i.owned).length);
+		const pendingCount = computed(
+			() => visibleItems.value.filter((i) => !i.owned).length,
+		);
 
-        const ownedCount = computed(() => visibleItems.value.filter((i) => i.owned).length);
+		const ownedCount = computed(
+			() => visibleItems.value.filter((i) => i.owned).length,
+		);
 
-        const scopeKind = computed(() => {
-            const scope = route.query.scope;
-            if (!scope || scope === "lote") return "lote";
-            const match = /^day-(\d)$/.exec(scope);
-            if (match) return "day";
-            return "lote";
-        });
+		const scopeKind = computed(() => {
+			const scope = route.query.scope;
+			if (!scope || scope === "lote") return "lote";
+			const match = /^day-(\d)$/.exec(scope);
+			if (match) return "day";
+			return "lote";
+		});
 
-        const scopeDay = computed(() => {
-            const scope = route.query.scope;
-            if (!scope) return null;
-            const match = /^day-(\d)$/.exec(scope);
-            if (!match) return null;
-            return DAY_NAMES[Number(match[1])] ?? null;
-        });
+		const scopeDay = computed(() => {
+			const scope = route.query.scope;
+			if (!scope) return null;
+			const match = /^day-(\d)$/.exec(scope);
+			if (!match) return null;
+			return DAY_NAMES[Number(match[1])] ?? null;
+		});
 
-        const toggleOwned = (codeKey) => {
-            const next = new Set(owned.value);
-            if (next.has(codeKey)) next.delete(codeKey);
-            else next.add(codeKey);
-            owned.value = next;
-            saveOwned(next);
-        };
+		const toggleOwned = (codeKey) => {
+			const next = new Set(owned.value);
+			if (next.has(codeKey)) next.delete(codeKey);
+			else next.add(codeKey);
+			owned.value = next;
+			saveOwned(next);
+		};
 
-        const clearOwned = () => {
-            owned.value = new Set();
-            saveOwned(owned.value);
-        };
+		const clearOwned = () => {
+			owned.value = new Set();
+			saveOwned(owned.value);
+		};
 
-        const numberFormat = (unit, value, display = "narrow") =>
-            new Intl.NumberFormat(currentLocale.value, {
-                style: "unit",
-                unit,
-                unitDisplay: display,
-            }).format(value);
+		const numberFormat = (unit, value, display = "narrow") =>
+			new Intl.NumberFormat(currentLocale.value, {
+				style: "unit",
+				unit,
+				unitDisplay: display,
+			}).format(value);
 
-        const formatPurchase = (item) => {
-            const q = item.purchaseQuantity;
-            const u = item.purchaseUnit;
-            if (u === "g") {
-                return q >= 1000
-                    ? numberFormat("kilogram", q / 1000, "short")
-                    : numberFormat("gram", q);
-            }
-            if (u === "ml") {
-                return q >= 1000
-                    ? numberFormat("liter", q / 1000, "short")
-                    : numberFormat("milliliter", q);
-            }
-            return `${Math.ceil(q)} ${u}`;
-        };
+		const formatPurchase = (item) => {
+			const q = item.purchaseQuantity;
+			const u = item.purchaseUnit;
+			if (u === "g") {
+				return q >= 1000
+					? numberFormat("kilogram", q / 1000, "short")
+					: numberFormat("gram", q);
+			}
+			if (u === "ml") {
+				return q >= 1000
+					? numberFormat("liter", q / 1000, "short")
+					: numberFormat("milliliter", q);
+			}
+			return `${Math.ceil(q)} ${u}`;
+		};
 
-        const formatNeeded = (item) => {
-            const q = Math.ceil(item.totalQuantity);
-            const u = item.unit;
-            if (u === "g") return numberFormat("gram", q);
-            if (u === "ml") return numberFormat("milliliter", q);
-            return `${q} ${u}`;
-        };
+		const formatNeeded = (item) => {
+			const q = Math.ceil(item.totalQuantity);
+			const u = item.unit;
+			if (u === "g") return numberFormat("gram", q);
+			if (u === "ml") return numberFormat("milliliter", q);
+			return `${q} ${u}`;
+		};
 
-        const print = () => window.print();
+		const print = () => window.print();
 
-        const load = async () => {
-            loading.value = true;
-            error.value = null;
+		const load = async () => {
+			loading.value = true;
+			error.value = null;
 
-            try {
-                const ids = planner.selectedRecipeIds;
-                if (!ids || ids.length === 0) {
-                    items.value = [];
-                    return;
-                }
+			try {
+				const ids = planner.selectedRecipeIds;
+				if (!ids || ids.length === 0) {
+					items.value = [];
+					return;
+				}
 
-                const { data, error: fetchError } = await supabase
-                    .from("recipes")
-                    .select(BASE_SELECT_FIELDS)
-                    .in("id", ids);
-                if (fetchError) throw fetchError;
+				const { data, error: fetchError } = await supabase
+					.from("recipes")
+					.select(BASE_SELECT_FIELDS)
+					.in("id", ids);
+				if (fetchError) throw fetchError;
 
-                const recipes = (data ?? []).map((r) => transformRecipe(r, []));
-                const plan = generateDietPlan(recipes, planner);
-                const scopedPlan = filterPlanByScope(plan, route.query.scope);
-                const portions = computePortions(scopedPlan);
+				const recipes = (data ?? []).map((r) => transformRecipe(r, []));
+				const plan = generateDietPlan(recipes, planner);
+				const scopedPlan = filterPlanByScope(plan, route.query.scope);
+				const portions = computePortions(scopedPlan);
 
-                items.value = buildShoppingList(recipes, portions);
-            } catch (err) {
-                error.value = err;
-            } finally {
-                loading.value = false;
-            }
-        };
+				items.value = buildShoppingList(recipes, portions);
+			} catch (err) {
+				error.value = err;
+			} finally {
+				loading.value = false;
+			}
+		};
 
-        onMounted(load);
+		onMounted(load);
 
-        return {
-            items: visibleItems,
-            pendingCount,
-            ownedCount,
-            scopeKind,
-            scopeDay,
-            loading,
-            error,
-            toggleOwned,
-            clearOwned,
-            formatPurchase,
-            formatNeeded,
-            print,
-            load,
-            currentLocale,
-        };
-    },
-    template: `
+		return {
+			items: visibleItems,
+			pendingCount,
+			ownedCount,
+			scopeKind,
+			scopeDay,
+			loading,
+			error,
+			toggleOwned,
+			clearOwned,
+			formatPurchase,
+			formatNeeded,
+			print,
+			load,
+			currentLocale,
+		};
+	},
+	template: `
         <div class="shopping-page">
             <header class="shopping-page__header no-print">
                 <div class="shopping-page__heading">
@@ -262,5 +268,5 @@ export default {
                 </ul>
             </template>
         </div>
-    `
+    `,
 };

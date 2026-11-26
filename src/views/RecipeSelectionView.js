@@ -1,3 +1,4 @@
+import { useRouter } from "vueRouter";
 import {
 	computed,
 	onMounted,
@@ -7,7 +8,6 @@ import {
 	useTemplateRef,
 	watch,
 } from "vue";
-import { useRouter } from "vueRouter";
 import { useLocale } from "../composables/useLocale.js";
 import { sortTranslated } from "../i18n.js";
 import { supabase } from "../lib/supabase.js";
@@ -226,17 +226,19 @@ export default {
 		const toggleRecipeSelection = (id) => {
 			if (!id) return;
 			if (planner.selectedRecipeIds.includes(id))
-				planner.selectedRecipeIds = planner.selectedRecipeIds.filter((x) => x !== id);
+				planner.selectedRecipeIds = planner.selectedRecipeIds.filter(
+					(x) => x !== id,
+				);
 			else planner.selectedRecipeIds = [...planner.selectedRecipeIds, id];
 		};
 
-		const clearSelection = () => planner.selectedRecipeIds = [];
+		const clearSelection = () => (planner.selectedRecipeIds = []);
 
 		const goToDietPlan = () => {
 			if (selectedCount.value === 0) return;
 			router.push({ name: "diet" });
 		};
-		
+
 		watch(categoryStates, () => {
 			if (loadingCategories.value) return;
 			if (debounceTimer) clearTimeout(debounceTimer);

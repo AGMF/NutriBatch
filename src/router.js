@@ -1,10 +1,10 @@
 import { createRouter, createWebHashHistory } from "vueRouter";
 import { planner } from "./stores/planner.js";
+import CookingModeView from "./views/CookingModeView.js";
+import DietPlanView from "./views/DietPlanView.js";
 import HomeView from "./views/HomeView.js";
 import PlannerSetupView from "./views/PlannerSetupView.js";
 import RecipeSelectionView from "./views/RecipeSelectionView.js";
-import DietPlanView from "./views/DietPlanView.js";
-import CookingModeView from "./views/CookingModeView.js";
 import ShoppingListView from "./views/ShoppingListView.js";
 
 const hasSetup = () =>
@@ -51,7 +51,7 @@ const routes = [
 		name: "shopping",
 		component: ShoppingListView,
 		beforeEnter: requireSetupAndSelection,
-	}
+	},
 ];
 
 const router = createRouter({

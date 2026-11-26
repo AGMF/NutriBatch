@@ -1175,8 +1175,7 @@
 		inset-inline: 0;
 		inset-block-end: 0;
 		z-index: 30;
-		padding:
-			0.75rem var(--gutter)
+		padding: 0.75rem var(--gutter)
 			calc(0.75rem + env(safe-area-inset-bottom, 0px));
 		background: color-mix(in oklch, var(--bg) 85%, transparent);
 		backdrop-filter: blur(16px) saturate(1.5);
@@ -2410,9 +2409,18 @@
 		grid-template-rows: auto 1fr auto;
 		gap: clamp(1rem, 3vw, 1.5rem);
 		padding: clamp(1rem, 3vw, 2rem);
-		padding-block-end: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-bottom, 0px));
-		padding-inline-start: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-left, 0px));
-		padding-inline-end: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-right, 0px));
+		padding-block-end: calc(
+			clamp(1rem, 3vw, 2rem) +
+			env(safe-area-inset-bottom, 0px)
+		);
+		padding-inline-start: calc(
+			clamp(1rem, 3vw, 2rem) +
+			env(safe-area-inset-left, 0px)
+		);
+		padding-inline-end: calc(
+			clamp(1rem, 3vw, 2rem) +
+			env(safe-area-inset-right, 0px)
+		);
 		color: oklch(96% 0.01 300);
 		background: oklch(18% 0.03 300);
 		overflow-y: auto;
@@ -2627,11 +2635,7 @@
 
 @layer utilities {
 	@supports (corner-shape: squircle) {
-		:where(
-				.cooking__exit,
-				.cooking__nav,
-				.cooking__active-item
-			) {
+		:where(.cooking__exit, .cooking__nav, .cooking__active-item) {
 			corner-shape: squircle;
 		}
 	}

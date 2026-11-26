@@ -1,8 +1,8 @@
-import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vueRouter";
+import { computed, onMounted, ref } from "vue";
+import { useLocale } from "../composables/useLocale.js";
 import { sortTranslated } from "../i18n.js";
 import { supabase } from "../lib/supabase.js";
-import { useLocale } from "../composables/useLocale.js";
 import { planner } from "../stores/planner.js";
 import { generateDietPlan, summarizePlanMacros } from "../utils/mealPlanner.js";
 import { BASE_SELECT_FIELDS, transformRecipe } from "../utils/recipes.js";
@@ -10,98 +10,101 @@ import { BASE_SELECT_FIELDS, transformRecipe } from "../utils/recipes.js";
 const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 export default {
-    name: "DietPlanView",
-    setup() {
-        const router = useRouter();
-        const { currentLocale } = useLocale();
+	name: "DietPlanView",
+	setup() {
+		const router = useRouter();
+		const { currentLocale } = useLocale();
 
-        const loading = ref(true);
-        const error = ref(null);
-        const recipes = ref([]);
+		const loading = ref(true);
+		const error = ref(null);
+		const recipes = ref([]);
 
-        const plan = computed(() => generateDietPlan(recipes.value, planner));
-        const totalMacros = computed(() => summarizePlanMacros(plan.value));
+		const plan = computed(() => generateDietPlan(recipes.value, planner));
+		const totalMacros = computed(() => summarizePlanMacros(plan.value));
 
-        const averageKcal = computed(() => {
-            if (!plan.value.length) return 0;
-            return Math.round(totalMacros.value.kcal / plan.value.length);
-        });
+		const averageKcal = computed(() => {
+			if (!plan.value.length) return 0;
+			return Math.round(totalMacros.value.kcal / plan.value.length);
+		});
 
-        const dayName = (dayIndex) => DAY_KEYS[dayIndex] ?? String(dayIndex);
+		const dayName = (dayIndex) => DAY_KEYS[dayIndex] ?? String(dayIndex);
 
-        const formatGram = (amount, unit = "gram") =>
-            new Intl.NumberFormat(currentLocale.value, {
-                style: "unit",
-                unit,
-                unitDisplay: "narrow",
-            }).format(amount);
+		const formatGram = (amount, unit = "gram") =>
+			new Intl.NumberFormat(currentLocale.value, {
+				style: "unit",
+				unit,
+				unitDisplay: "narrow",
+			}).format(amount);
 
-        const formatNutrientValue = (val) => {
-            if (!val || val === 0) return "0";
-            if (val >= 100) return val.toFixed(0);
-            if (val >= 10) return val.toFixed(1);
-            return val.toFixed(2);
-        };
+		const formatNutrientValue = (val) => {
+			if (!val || val === 0) return "0";
+			if (val >= 100) return val.toFixed(0);
+			if (val >= 10) return val.toFixed(1);
+			return val.toFixed(2);
+		};
 
-        const formatKcal = (val) => Math.round(val ?? 0);
+		const formatKcal = (val) => Math.round(val ?? 0);
 
-        const friendlyError = (err) => {
-            if (err === "no-recipes") return "ui:diet.errors.no_recipes";
-            if (err?.message?.includes("Failed to fetch")) return "ui:errors.network";
-            return "ui:errors.unknown";
-        };
+		const friendlyError = (err) => {
+			if (err === "no-recipes") return "ui:diet.errors.no_recipes";
+			if (err?.message?.includes("Failed to fetch")) return "ui:errors.network";
+			return "ui:errors.unknown";
+		};
 
-        const loadRecipes = async () => {
-            loading.value = true;
-            error.value = null;
+		const loadRecipes = async () => {
+			loading.value = true;
+			error.value = null;
 
-            const ids = planner.selectedRecipeIds;
-            if (!ids || ids.length === 0) {
-                error.value = "no-recipes";
-                loading.value = false;
-                return;
-            }
+			const ids = planner.selectedRecipeIds;
+			if (!ids || ids.length === 0) {
+				error.value = "no-recipes";
+				loading.value = false;
+				return;
+			}
 
-            try {
-                const { data, error: fetchError } = await supabase
-                    .from("recipes")
-                    .select(BASE_SELECT_FIELDS)
-                    .in("id", ids);
+			try {
+				const { data, error: fetchError } = await supabase
+					.from("recipes")
+					.select(BASE_SELECT_FIELDS)
+					.in("id", ids);
 
-                if (fetchError) throw fetchError;
+				if (fetchError) throw fetchError;
 
-                const sortNutrientKey = (n) => `ui:nutrition.nutrients.${n.key}`;
-                recipes.value = (data || []).map((recipe) =>
-                    transformRecipe(recipe, [], (nutrients) => sortTranslated(nutrients, sortNutrientKey)));
-            } catch (err) {
-                error.value = err;
-            } finally {
-                loading.value = false;
-            }
-        };
+				const sortNutrientKey = (n) => `ui:nutrition.nutrients.${n.key}`;
+				recipes.value = (data || []).map((recipe) =>
+					transformRecipe(recipe, [], (nutrients) =>
+						sortTranslated(nutrients, sortNutrientKey),
+					),
+				);
+			} catch (err) {
+				error.value = err;
+			} finally {
+				loading.value = false;
+			}
+		};
 
-        const backToRecipes = () => router.push({ name: "recipes" });
-        const restart = () => router.push({ name: "planner" });
+		const backToRecipes = () => router.push({ name: "recipes" });
+		const restart = () => router.push({ name: "planner" });
 
-        onMounted(loadRecipes);
+		onMounted(loadRecipes);
 
-        return {
-            loading,
-            error,
-            plan,
-            totalMacros,
-            averageKcal,
-            dayName,
-            formatGram,
-            formatNutrientValue,
-            formatKcal,
-            friendlyError,
-            loadRecipes,
-            backToRecipes,
-            restart,
-        };
-    },
-    template: `
+		return {
+			loading,
+			error,
+			plan,
+			totalMacros,
+			averageKcal,
+			dayName,
+			formatGram,
+			formatNutrientValue,
+			formatKcal,
+			friendlyError,
+			loadRecipes,
+			backToRecipes,
+			restart,
+		};
+	},
+	template: `
         <div class="diet-page">
             <header class="diet-page__header">
                 <h2 class="section-title">{{ $t('ui:diet.title') }}</h2>
@@ -224,5 +227,5 @@ export default {
                 </div>
             </template>
         </div>
-    `
+    `,
 };
