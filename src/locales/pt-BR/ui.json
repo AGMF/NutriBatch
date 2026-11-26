@@ -123,6 +123,17 @@
 			"no_recipes": "Nenhuma receita foi selecionada. Volte e escolha ao menos uma."
 		}
 	},
+	"cooking": {
+		"region": "Modo de preparo",
+		"exit": "Sair",
+		"progress": "Passo {{current}} de {{total}}",
+		"loading": "Preparando o roteiro…",
+		"empty": "Não há passos para preparar.",
+		"passive_label": "Passo passivo",
+		"active_title": "Enquanto isso",
+		"prev": "Anterior",
+		"next": "Próximo"
+	},
 	"filters": {
 		"title": "Filtros",
 		"clear": "Limpar filtros",

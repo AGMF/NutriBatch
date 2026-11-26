@@ -4,11 +4,18 @@ import HomeView from "./views/HomeView.js";
 import PlannerSetupView from "./views/PlannerSetupView.js";
 import RecipeSelectionView from "./views/RecipeSelectionView.js";
 import DietPlanView from "./views/DietPlanView.js";
+import CookingModeView from "./views/CookingModeView.js";
 
 const hasSetup = () =>
 	planner.dailyKcal > 0 &&
 	planner.selectedDays.length > 0 &&
 	planner.meals.length > 0;
+
+const requireSetupAndSelection = () => {
+	if (!hasSetup()) return { name: "planner" };
+	if (planner.selectedRecipeIds.length === 0) return { name: "recipes" };
+	return true;
+};
 
 const routes = [
 	{
@@ -30,11 +37,13 @@ const routes = [
 		path: "/diet",
 		name: "diet",
 		component: DietPlanView,
-		beforeEnter: () => {
-			if (!hasSetup()) return { name: "planner" };
-			if (planner.selectedRecipeIds.length === 0) return { name: "recipes" };
-			return true;
-		},
+		beforeEnter: requireSetupAndSelection,
+	},
+	{
+		path: "/cooking/:scope",
+		name: "cooking",
+		component: CookingModeView,
+		beforeEnter: requireSetupAndSelection,
 	},
 ];
 

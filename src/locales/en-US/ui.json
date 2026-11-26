@@ -123,6 +123,17 @@
 			"no_recipes": "No recipes were selected. Go back and pick at least one."
 		}
 	},
+	"cooking": {
+		"region": "Cooking mode",
+		"exit": "Exit",
+		"progress": "Step {{current}} of {{total}}",
+		"loading": "Preparing your runbook…",
+		"empty": "There are no steps to cook.",
+		"passive_label": "Passive step",
+		"active_title": "Meanwhile",
+		"prev": "Previous",
+		"next": "Next"
+	},
 	"filters": {
 		"title": "Filters",
 		"clear": "Clear filters",
