@@ -1,7 +1,14 @@
 import { createRouter, createWebHashHistory } from "vueRouter";
+import { planner } from "./stores/planner.js";
 import HomeView from "./views/HomeView.js";
 import PlannerSetupView from "./views/PlannerSetupView.js";
 import RecipeSelectionView from "./views/RecipeSelectionView.js";
+import DietPlanView from "./views/DietPlanView.js";
+
+const hasSetup = () =>
+	planner.dailyKcal > 0 &&
+	planner.selectedDays.length > 0 &&
+	planner.meals.length > 0;
 
 const routes = [
 	{
@@ -18,6 +25,16 @@ const routes = [
 		path: "/recipes",
 		name: "recipes",
 		component: RecipeSelectionView,
+	},
+	{
+		path: "/diet",
+		name: "diet",
+		component: DietPlanView,
+		beforeEnter: () => {
+			if (!hasSetup()) return { name: "planner" };
+			if (planner.selectedRecipeIds.length === 0) return { name: "recipes" };
+			return true;
+		},
 	},
 ];
 

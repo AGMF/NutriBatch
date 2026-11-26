@@ -87,6 +87,22 @@
 			"cancel": "Back"
 		}
 	},
+	"recipes": {
+		"select": "Select",
+		"selected": "Selected",
+		"select_aria": "Select {{name}}",
+		"selection_count_one": "{{count}} recipe selected",
+		"selection_count_other": "{{count}} recipes selected",
+		"selection_count_zero": "No recipes selected",
+		"selection_region": "Selected recipes",
+		"build_diet": "Build diet plan",
+		"clear_selection": "Clear selection"
+	},
+	"diet": {
+		"title": "Your meal plan",
+		"building": "Building your diet…",
+		"back": "Back to recipes"
+	},
 	"filters": {
 		"title": "Filters",
 		"clear": "Clear filters",

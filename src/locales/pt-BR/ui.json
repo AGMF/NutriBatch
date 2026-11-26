@@ -87,6 +87,22 @@
 			"cancel": "Voltar"
 		}
 	},
+	"recipes": {
+		"select": "Selecionar",
+		"selected": "Selecionada",
+		"select_aria": "Selecionar {{name}}",
+		"selection_count_one": "{{count}} receita selecionada",
+		"selection_count_other": "{{count}} receitas selecionadas",
+		"selection_count_zero": "Nenhuma receita selecionada",
+		"selection_region": "Receitas selecionadas",
+		"build_diet": "Montar dieta",
+		"clear_selection": "Limpar seleção"
+	},
+	"diet": {
+		"title": "Seu plano alimentar",
+		"building": "Montando sua dieta…",
+		"back": "Voltar às receitas"
+	},
 	"filters": {
 		"title": "Filtros",
 		"clear": "Limpar filtros",

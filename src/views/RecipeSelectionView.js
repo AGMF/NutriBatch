@@ -1,4 +1,5 @@
 import {
+	computed,
 	onMounted,
 	onUnmounted,
 	ref,
@@ -6,9 +7,11 @@ import {
 	useTemplateRef,
 	watch,
 } from "vue";
+import { useRouter } from "vueRouter";
 import { useLocale } from "../composables/useLocale.js";
 import { sortTranslated } from "../i18n.js";
 import { supabase } from "../lib/supabase.js";
+import { planner } from "../stores/planner.js";
 import {
 	buildRecipesQuery,
 	calculateRange,
@@ -26,6 +29,7 @@ import {
 export default {
 	name: "RecipeSelectionView",
 	setup() {
+		const router = useRouter();
 		const { currentLocale, formatDuration } = useLocale();
 
 		const items = shallowRef([]);
@@ -215,6 +219,24 @@ export default {
 				categories.value.map((c) => [c.id, "ignore"]),
 			));
 
+		const selectedCount = computed(() => planner.selectedRecipeIds.length);
+
+		const isSelected = (id) => planner.selectedRecipeIds.includes(id);
+
+		const toggleRecipeSelection = (id) => {
+			if (!id) return;
+			if (planner.selectedRecipeIds.includes(id))
+				planner.selectedRecipeIds = planner.selectedRecipeIds.filter((x) => x !== id);
+			else planner.selectedRecipeIds = [...planner.selectedRecipeIds, id];
+		};
+
+		const clearSelection = () => planner.selectedRecipeIds = [];
+
+		const goToDietPlan = () => {
+			if (selectedCount.value === 0) return;
+			router.push({ name: "diet" });
+		};
+		
 		watch(categoryStates, () => {
 			if (loadingCategories.value) return;
 			if (debounceTimer) clearTimeout(debounceTimer);
@@ -271,6 +293,11 @@ export default {
 			formatGram,
 			formatDuration,
 			formatRecipeEquipment,
+			selectedCount,
+			isSelected,
+			toggleRecipeSelection,
+			clearSelection,
+			goToDietPlan,
 		};
 	},
 	template: `
@@ -323,7 +350,11 @@ export default {
             </form>
         </section>
 
-        <section class="results" aria-labelledby="results-title" :aria-busy="loading">
+        <section
+			class="results"
+			aria-labelledby="results-title"
+			:aria-busy="loading"
+			:data-has-selection="selectedCount > 0 ? 'true' : 'false'">
             <h2 id="results-title" class="section-title" tabindex="-1" ref="resultsHeading">{{ $t('ui:results.title') }}</h2>
 
             <div v-if="errorMessage" class="alert" role="alert">
@@ -342,7 +373,23 @@ export default {
                 </p>
 
                 <div v-else class="results__grid">
-                    <article v-for="item in items" :key="item.id" class="card">
+                    <article
+						v-for="item in items"
+						:key="item.id"
+						class="card"
+						:data-selected="isSelected(item.id) ? 'true' : 'false'">
+						<button
+							class="card__select"
+							type="button"
+							:aria-pressed="isSelected(item.id) ? 'true' : 'false'"
+							:aria-label="$t('ui:recipes.select_aria', { name: $t('recipes:' + item.name_key) })"
+							@click="toggleRecipeSelection(item.id)">
+							<span class="card__select-icon" aria-hidden="true"></span>
+							<span class="card__select-label">
+								{{ isSelected(item.id) ? $t('ui:recipes.selected') : $t('ui:recipes.select') }}
+							</span>
+						</button>
+
                         <h3 class="card__title">{{ $t('recipes:' + item.name_key) }}</h3>
 
                         <div class="card__categories">
@@ -446,5 +493,27 @@ export default {
                 </div>
             </template>
         </section>
+
+		<div
+			v-if="selectedCount > 0"
+			class="selection-bar"
+			role="region"
+			:aria-label="$t('ui:recipes.selection_region')">
+			<div class="selection-bar__inner">
+				<p class="selection-bar__count" aria-live="polite" aria-atomic="true">
+					{{ $t('ui:recipes.selection_count', { count: selectedCount }) }}
+				</p>
+				<div class="selection-bar__actions">
+					<button
+						type="button"
+						class="selection-bar__clear"
+						@click="clearSelection">{{ $t('ui:recipes.clear_selection') }}</button>
+					<button
+						type="button"
+						class="btn btn--primary"
+						@click="goToDietPlan">{{ $t('ui:recipes.build_diet') }}</button>
+				</div>
+			</div>
+		</div>
     `,
 };
