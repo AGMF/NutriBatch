@@ -2122,20 +2122,252 @@
 		gap: clamp(1.25rem, 3vw, 2rem);
 	}
 
-	.diet-page__placeholder {
+	.diet-page__header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem 1rem;
+	}
+
+	.diet-page__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.diet-summary {
 		display: grid;
-		gap: 1rem;
-		justify-items: center;
-		padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 3vw, 2rem);
-		text-align: center;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+		gap: 0.75rem;
+	}
+
+	.diet-summary__item {
+		display: grid;
+		gap: 0.15rem;
+		padding: 0.8rem 1rem;
 		background: var(--surface);
-		border: 1.5px dashed var(--border);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.diet-summary__label {
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.diet-summary__value {
+		font-size: var(--step-1);
+		font-weight: 800;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: -0.01em;
+	}
+
+	.diet-days {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+		gap: clamp(0.9rem, 2.5vw, 1.5rem);
+		align-items: start;
+	}
+
+	.diet-day {
+		display: grid;
+		gap: 0.75rem;
+		padding: clamp(1rem, 2vw, 1.35rem);
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-block-start: 0.28em solid var(--primary);
 		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.diet-day__header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.diet-day__title {
+		font-size: var(--step-1);
+		font-weight: 800;
+		letter-spacing: -0.02em;
+	}
+
+	.diet-day__kcal {
+		font-size: var(--step--1);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--text-muted);
+	}
+
+	.diet-day__kcal strong {
+		font-weight: 800;
+		color: var(--text);
+	}
+
+	.diet-meals {
+		display: grid;
+		gap: 0.65rem;
+		counter-reset: meal-step;
+	}
+
+	.diet-meal {
+		padding: 0.75rem 0.85rem 0.85rem;
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+	}
+
+	.diet-meal__header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.4rem;
+		margin-block-end: 0.55rem;
+		padding-block-end: 0.5rem;
+		border-block-end: 1px dashed var(--border);
+	}
+
+	.diet-meal__title {
+		font-size: var(--step-0);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+	}
+
+	.diet-meal__kcal {
+		font-size: var(--step--1);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--text-muted);
+	}
+
+	.diet-meal__recipes {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.diet-recipe {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 0.5rem 1rem;
+		align-items: center;
+		padding-block: 0.35rem;
+	}
+
+	.diet-recipe + .diet-recipe {
+		padding-block-start: 0.6rem;
+		border-block-start: 1px solid
+			color-mix(in oklch, var(--border) 60%, transparent);
+	}
+
+	.diet-recipe__main {
+		min-inline-size: 0;
+	}
+
+	.diet-recipe__name {
+		font-size: var(--step-0);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		margin-block-end: 0.2rem;
+		text-wrap: balance;
+	}
+
+	.diet-recipe__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 0.85rem;
+		font-size: var(--step--1);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--text-muted);
+	}
+
+	.diet-recipe__grams {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.diet-recipe__grams::before {
+		content: "";
+		inline-size: 0.45em;
+		block-size: 0.45em;
+		background: var(--primary);
+		border-radius: 50%;
+		opacity: 0.8;
+	}
+
+	.diet-recipe__macros {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+	}
+
+	.diet-recipe__macros li {
+		display: grid;
+		gap: 0.05rem;
+		min-inline-size: 3.4rem;
+		padding: 0.3rem 0.5rem;
+		text-align: center;
+		font-variant-numeric: tabular-nums;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+	}
+
+	.diet-recipe__macros li > span {
+		font-size: 0.6rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+	}
+
+	.diet-recipe__macros li > strong {
+		font-size: 0.8rem;
+		font-weight: 800;
+		color: var(--text);
 	}
 
 	@media (min-width: 64rem) {
 		.diet-page {
 			grid-column: 1 / -1;
+		}
+	}
+
+	@media (min-width: 40rem) {
+		.diet-recipe {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.diet-recipe__macros {
+			justify-content: flex-start;
+		}
+	}
+
+	@media (pointer: coarse) {
+		.diet-page__actions .btn {
+			min-block-size: 2.75rem;
+		}
+	}
+}
+
+@layer utilities {
+	@supports (corner-shape: squircle) {
+		:where(
+				.diet-summary__item,
+				.diet-day,
+				.diet-meal,
+				.diet-recipe__macros li
+			) {
+			corner-shape: squircle;
 		}
 	}
 }

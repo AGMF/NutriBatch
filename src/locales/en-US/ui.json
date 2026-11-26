@@ -100,8 +100,28 @@
 	},
 	"diet": {
 		"title": "Your meal plan",
-		"building": "Building your diet…",
-		"back": "Back to recipes"
+		"loading": "Loading your recipes…",
+		"empty": "There are no meals in your plan.",
+		"back": "Change recipes",
+		"restart": "Adjust goals",
+		"macros": "Portion macronutrients",
+		"summary_region": "Plan summary",
+		"summary": {
+			"days": "Days",
+			"avg_kcal": "Daily average"
+		},
+		"days": {
+			"sun": "Sunday",
+			"mon": "Monday",
+			"tue": "Tuesday",
+			"wed": "Wednesday",
+			"thu": "Thursday",
+			"fri": "Friday",
+			"sat": "Saturday"
+		},
+		"errors": {
+			"no_recipes": "No recipes were selected. Go back and pick at least one."
+		}
 	},
 	"filters": {
 		"title": "Filters",

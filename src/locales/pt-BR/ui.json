@@ -100,8 +100,28 @@
 	},
 	"diet": {
 		"title": "Seu plano alimentar",
-		"building": "Montando sua dieta…",
-		"back": "Voltar às receitas"
+		"loading": "Carregando suas receitas…",
+		"empty": "Não há refeições no seu plano.",
+		"back": "Trocar receitas",
+		"restart": "Ajustar metas",
+		"macros": "Macronutrientes da porção",
+		"summary_region": "Resumo do plano",
+		"summary": {
+			"days": "Dias",
+			"avg_kcal": "Média diária"
+		},
+		"days": {
+			"sun": "Domingo",
+			"mon": "Segunda-feira",
+			"tue": "Terça-feira",
+			"wed": "Quarta-feira",
+			"thu": "Quinta-feira",
+			"fri": "Sexta-feira",
+			"sat": "Sábado"
+		},
+		"errors": {
+			"no_recipes": "Nenhuma receita foi selecionada. Volte e escolha ao menos uma."
+		}
 	},
 	"filters": {
 		"title": "Filtros",

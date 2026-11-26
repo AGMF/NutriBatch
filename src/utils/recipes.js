@@ -203,7 +203,7 @@ export const calculateRange = (page, pageSize) => ({
 	to: (page + 1) * pageSize - 1,
 });
 
-const BASE_SELECT_FIELDS = `
+export const BASE_SELECT_FIELDS = `
     id,
     name_key,
     description_key,
