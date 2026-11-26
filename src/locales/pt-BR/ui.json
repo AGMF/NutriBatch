@@ -134,6 +134,22 @@
 		"prev": "Anterior",
 		"next": "Próximo"
 	},
+	"shopping": {
+		"title": "Lista de compras",
+		"loading": "Montando sua lista…",
+		"empty": "Nenhum ingrediente para comprar.",
+		"back": "Voltar ao plano",
+		"print": "Imprimir",
+		"clear_owned": "Limpar marcações",
+		"owned": "Já tenho",
+		"needed_label": "Quantidade necessária",
+		"buy": "Comprar: {{qty}}",
+		"summary": "{{pending}} de {{total}} itens pendentes",
+		"scope_label": "Referente a",
+		"scopes": {
+			"lote": "Todas as receitas do plano"
+		}
+	},
 	"filters": {
 		"title": "Filtros",
 		"clear": "Limpar filtros",

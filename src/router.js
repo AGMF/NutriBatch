@@ -5,6 +5,7 @@ import PlannerSetupView from "./views/PlannerSetupView.js";
 import RecipeSelectionView from "./views/RecipeSelectionView.js";
 import DietPlanView from "./views/DietPlanView.js";
 import CookingModeView from "./views/CookingModeView.js";
+import ShoppingListView from "./views/ShoppingListView.js";
 
 const hasSetup = () =>
 	planner.dailyKcal > 0 &&
@@ -45,6 +46,12 @@ const routes = [
 		component: CookingModeView,
 		beforeEnter: requireSetupAndSelection,
 	},
+	{
+		path: "/shopping",
+		name: "shopping",
+		component: ShoppingListView,
+		beforeEnter: requireSetupAndSelection,
+	}
 ];
 
 const router = createRouter({

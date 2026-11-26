@@ -134,6 +134,22 @@
 		"prev": "Previous",
 		"next": "Next"
 	},
+	"shopping": {
+		"title": "Shopping list",
+		"loading": "Building your list…",
+		"empty": "There are no ingredients to buy.",
+		"back": "Back to plan",
+		"print": "Print",
+		"clear_owned": "Clear marks",
+		"owned": "Already have",
+		"needed_label": "Required amount",
+		"buy": "Buy: {{qty}}",
+		"summary": "{{pending}} of {{total}} items pending",
+		"scope_label": "For",
+		"scopes": {
+			"lote": "All recipes in the plan"
+		}
+	},
 	"filters": {
 		"title": "Filters",
 		"clear": "Clear filters",
